@@ -79,10 +79,23 @@ openssl rand -base64 32
 
 The dashboard will show your connected account status and confirm that Gmail and Calendar permissions are granted.
 
+## Gemini AI Setup
+
+To enable AI-powered email classification:
+
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Create API Key"
+4. Copy the generated API key
+5. Add it to your `.env.local` file:
+   ```
+   GEMINI_API_KEY=your-actual-api-key-here
+   ```
+
 ## Next Steps
 
-Once OAuth is working, we'll implement:
-- Gmail API integration to extract tasks from emails
+Once OAuth and Gemini AI are configured:
+- Gmail API integration to extract tasks from emails ✅
+- AI-powered email classification with Gemini ✅
 - Google Calendar API integration for scheduling
-- AI-powered task prioritization with Gemini
-- Kanban board interface for task management
+- Kanban board interface for task management ✅

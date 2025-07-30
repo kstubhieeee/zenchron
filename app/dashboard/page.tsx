@@ -1,50 +1,21 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 export default function Dashboard() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/signin");
-    }
-  }, [status, router]);
-
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return null;
-  }
+  const { data: session } = useSession();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Welcome back, {session.user?.name}!</p>
-          </div>
-          <Button onClick={() => signOut({ callbackUrl: "/" })} variant="outline">
-            Sign Out
-          </Button>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Welcome back, {session?.user?.name}!</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Account Connected</CardTitle>
@@ -53,13 +24,13 @@ export default function Dashboard() {
             <CardContent>
               <div className="flex items-center space-x-3">
                 <img 
-                  src={session.user?.image || ""} 
+                  src={session?.user?.image || ""} 
                   alt="Profile" 
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <p className="font-medium">{session.user?.name}</p>
-                  <p className="text-sm text-gray-500">{session.user?.email}</p>
+                  <p className="font-medium">{session?.user?.name}</p>
+                  <p className="text-sm text-gray-500">{session?.user?.email}</p>
                 </div>
               </div>
             </CardContent>
@@ -127,7 +98,34 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Get started with your task management</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                <h3 className="font-medium">📧 Sync Gmail Tasks</h3>
+                <p className="text-sm text-gray-600 mt-1">Extract tasks from your recent emails</p>
+              </div>
+              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                <h3 className="font-medium">📅 View Calendar</h3>
+                <p className="text-sm text-gray-600 mt-1">See your upcoming events and schedule</p>
+              </div>
+              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                <h3 className="font-medium">🤖 AI Assistant</h3>
+                <p className="text-sm text-gray-600 mt-1">Get AI-powered task prioritization</p>
+              </div>
+              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                <h3 className="font-medium">📋 Kanban Board</h3>
+                <p className="text-sm text-gray-600 mt-1">Organize tasks visually</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
