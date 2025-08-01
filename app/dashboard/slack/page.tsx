@@ -28,11 +28,12 @@ interface SlackMessage {
 interface SlackResponse {
   messages: SlackMessage[];
   totalFetched: number;
-  userId: string;
+  botUserId: string;
+  humanUserId: string;
   debug?: {
     channelsChecked: number;
     channelDetails: any[];
-    totalChannels: number;
+    strategiesUsed: string[];
   };
 }
 
@@ -141,6 +142,7 @@ function SlackPageContent() {
       }
 
       const data: SlackResponse = await response.json();
+      console.log("Received data:", data); // Debug log
       setMessages(data.messages);
       setDebugInfo(data.debug);
       
