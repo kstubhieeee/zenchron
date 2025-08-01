@@ -99,6 +99,30 @@ function SlackPageContent() {
     }
   };
 
+  const testSlackConnection = async () => {
+    if (!slackToken) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/slack/test", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: slackToken }),
+      });
+
+      const data = await response.json();
+      console.log("Test results:", data);
+      alert(`Test completed! Check console for details. Found ${data.channels?.length || 0} channels.`);
+    } catch (error) {
+      console.error("Test failed:", error);
+      alert("Test failed. Check console for details.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const fetchMessages = async () => {
     if (!slackToken) return;
 
@@ -177,6 +201,14 @@ function SlackPageContent() {
               >
                 <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
                 {isLoading ? "Fetching..." : "Fetch Messages"}
+              </Button>
+              <Button 
+                onClick={testSlackConnection} 
+                disabled={isLoading}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                Test Connection
               </Button>
               <Button variant="outline" onClick={disconnectSlack}>
                 Disconnect

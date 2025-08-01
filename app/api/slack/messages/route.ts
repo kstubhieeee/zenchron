@@ -41,6 +41,18 @@ export async function POST(request: NextRequest) {
       try {
         console.log(`Fetching from channel: ${channel.name || channel.id} (${channel.is_member ? 'member' : 'not member'})`);
         
+        // If not a member of a public channel, try to join it
+        if (!channel.is_member && !channel.is_private && !channel.is_im && !channel.is_mpim) {
+          console.log(`Trying to join channel: ${channel.name}`);
+          try {
+            await slack.conversations.join({ channel: channel.id! });
+            console.log(`Successfully joined channel: ${channel.name}`);
+            channel.is_member = true; // Update the local flag
+          } catch (joinError) {
+            console.log(`Failed to join channel ${channel.name}:`, joinError);
+          }
+        }
+        
         const messagesResponse = await slack.conversations.history({
           channel: channel.id!,
           limit: 50, // Increased limit
