@@ -38,19 +38,26 @@ export async function GET(request: NextRequest) {
     
     console.log("Notion webhook GET received");
     console.log("Challenge parameter:", challenge);
+    console.log("Full URL:", request.url);
     
     if (challenge) {
       console.log("Verification token from GET:", challenge);
-      // Return the challenge for verification
+      // Return the challenge for verification - try both formats
       return new Response(challenge, {
         status: 200,
-        headers: { 'Content-Type': 'text/plain' }
+        headers: { 
+          'Content-Type': 'text/plain',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type'
+        }
       });
     }
     
     return NextResponse.json({ 
       message: "Notion webhook endpoint is active",
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      method: "GET"
     });
     
   } catch (error) {
@@ -60,4 +67,16 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Add OPTIONS method for CORS
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    }
+  });
 }
