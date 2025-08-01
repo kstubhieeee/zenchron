@@ -43,12 +43,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard/slack?error=${tokenData.error}`);
     }
 
+    // Use bot token for API calls (has more permissions)
+    const botToken = tokenData.access_token; // This is the bot token in OAuth v2
+    const teamName = tokenData.team?.name || 'Unknown Team';
+
     // Store the Slack token in session storage or database
     // For now, we'll redirect with success and store in localStorage on client side
     const redirectUrl = new URL(`${process.env.NEXTAUTH_URL}/dashboard/slack`);
     redirectUrl.searchParams.set('success', 'true');
-    redirectUrl.searchParams.set('team', tokenData.team.name);
-    redirectUrl.searchParams.set('token', tokenData.access_token);
+    redirectUrl.searchParams.set('team', teamName);
+    redirectUrl.searchParams.set('token', botToken);
 
     return NextResponse.redirect(redirectUrl.toString());
 

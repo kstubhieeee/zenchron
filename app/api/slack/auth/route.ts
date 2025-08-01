@@ -4,8 +4,8 @@ export async function GET() {
   const clientId = process.env.SLACK_CLIENT_ID;
   const redirectUri = `${process.env.NEXTAUTH_URL}/api/slack/callback`;
 
-  // Slack OAuth scopes for reading messages and user info
-  const scopes = [
+  // Bot token scopes for reading messages and user info
+  const botScopes = [
     'channels:read',
     'groups:read',
     'im:read',
@@ -18,7 +18,12 @@ export async function GET() {
     'team:read'
   ].join(',');
 
-  const slackAuthUrl = `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=${scopes}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+  // User token scopes (minimal, mainly for user identification)
+  const userScopes = [
+    'identity.basic'
+  ].join(',');
+
+  const slackAuthUrl = `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=${botScopes}&user_scope=${userScopes}&redirect_uri=${encodeURIComponent(redirectUri)}`;
 
   return NextResponse.redirect(slackAuthUrl);
 }
