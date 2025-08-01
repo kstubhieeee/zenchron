@@ -104,3 +104,14 @@ export const RobotIcon = ({ className = "", size = 24 }: IconProps) => (
         </g>
     </svg>
 );
+
+export const SlackIcon = ({ className = "", size = 24 }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+        <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
+        <path d="M8 12h8M12 8v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="8" cy="8" r="1.5" fill="currentColor" fillOpacity="0.3" />
+        <circle cx="16" cy="8" r="1.5" fill="currentColor" fillOpacity="0.3" />
+        <circle cx="8" cy="16" r="1.5" fill="currentColor" fillOpacity="0.3" />
+        <circle cx="16" cy="16" r="1.5" fill="currentColor" fillOpacity="0.3" />
+    </svg>
+);

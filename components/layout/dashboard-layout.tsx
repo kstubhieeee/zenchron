@@ -15,6 +15,7 @@ import {
   SettingsIcon,
   LogoutIcon,
   RobotIcon,
+  SlackIcon,
 } from "@/components/icons/glass-icons";
 import { MenuIcon, ChevronLeftIcon } from "@/components/icons/menu-icons";
 
@@ -54,6 +55,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { title: "Tasks", url: "/dashboard/tasks", icon: TasksIcon },
     { title: "AI Assistant", url: "/dashboard/ai", icon: AIIcon },
     { title: "Gmail Sync", url: "/dashboard/gmail", icon: GmailIcon },
+    { title: "Slack", url: "/dashboard/slack", icon: SlackIcon },
     { title: "Calendar", url: "/dashboard/calendar", icon: CalendarIcon },
     { title: "Settings", url: "/dashboard/settings", icon: SettingsIcon },
   ];

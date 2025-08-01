@@ -1,130 +1,203 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useState, useRef, useEffect } from "react";
+import { Mic, MicOff, Plus, Send } from "lucide-react";
 
 export default function Dashboard() {
   const { data: session } = useSession();
+  const [taskInput, setTaskInput] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
+      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      
+      recognitionInstance.continuous = false;
+      recognitionInstance.interimResults = false;
+      recognitionInstance.lang = "en-US";
+
+      recognitionInstance.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setTaskInput(prev => prev + (prev ? " " : "") + transcript);
+        setIsListening(false);
+      };
+
+      recognitionInstance.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+      };
+
+      recognitionInstance.onend = () => {
+        setIsListening(false);
+      };
+
+      setRecognition(recognitionInstance);
+    }
+  }, []);
+
+  const startListening = () => {
+    if (recognition) {
+      setIsListening(true);
+      recognition.start();
+    } else {
+      alert("Speech recognition is not supported in your browser");
+    }
+  };
+
+  const stopListening = () => {
+    if (recognition) {
+      recognition.stop();
+      setIsListening(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (taskInput.trim()) {
+      // Here you would typically send the task to your API
+      console.log("New task:", taskInput);
+      alert(`Task added: ${taskInput}`);
+      setTaskInput("");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      handleSubmit();
+    }
+  };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {session?.user?.name}!</p>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Welcome back, {session?.user?.name?.split(" ")[0]}!
+          </h1>
+          <p className="text-xl text-gray-600">
+            What would you like to accomplish today?
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Account Connected</CardTitle>
-              <CardDescription>Google account successfully linked</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-3">
-                <img 
-                  src={session?.user?.image || ""} 
-                  alt="Profile" 
-                  className="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <p className="font-medium">{session?.user?.name}</p>
-                  <p className="text-sm text-gray-500">{session?.user?.email}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5 text-blue-600" />
+              Add New Task
+            </CardTitle>
+            <CardDescription>
+              Type or speak your task, deadline, or todo item. Be as detailed as you'd like.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="relative">
+              <Textarea
+                ref={textareaRef}
+                placeholder="e.g., 'Prepare client presentation for Friday meeting', 'Call dentist to schedule appointment by end of week', 'Review project proposal and send feedback by tomorrow 5pm'..."
+                value={taskInput}
+                onChange={(e) => setTaskInput(e.target.value)}
+                onKeyDown={handleKeyPress}
+                className="min-h-[120px] pr-16 text-base resize-none"
+                rows={4}
+              />
+              
+              {/* Voice Input Button */}
+              <Button
+                type="button"
+                variant={isListening ? "destructive" : "outline"}
+                size="sm"
+                className="absolute bottom-3 right-3"
+                onClick={isListening ? stopListening : startListening}
+                disabled={!recognition}
+              >
+                {isListening ? (
+                  <>
+                    <MicOff className="h-4 w-4" />
+                  </>
+                ) : (
+                  <>
+                    <Mic className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Gmail Access</CardTitle>
-              <CardDescription>Ready to sync emails</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-green-600">Connected</span>
+            {isListening && (
+              <div className="flex items-center gap-2 text-red-600 text-sm">
+                <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                Listening... Speak your task now
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Can read emails to extract tasks
-              </p>
-            </CardContent>
-          </Card>
+            )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Calendar Access</CardTitle>
-              <CardDescription>Ready to sync events</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-green-600">Connected</span>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-500">
+                💡 Tip: Press Ctrl+Enter to quickly add your task
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Can read and create calendar events
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+              <Button 
+                onClick={handleSubmit}
+                disabled={!taskInput.trim()}
+                className="flex items-center gap-2"
+              >
+                <Send className="h-4 w-4" />
+                Add Task
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
+        {/* Quick Examples */}
         <Card>
           <CardHeader>
-            <CardTitle>Next Steps</CardTitle>
+            <CardTitle className="text-lg">Example Tasks</CardTitle>
             <CardDescription>
-              Your Google account is connected with the following permissions:
+              Click any example to try it out
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center space-x-2">
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                <span>Gmail read access - to extract tasks from emails</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                <span>Google Calendar read/write access - to sync and create events</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                <span>Profile information - for personalization</span>
-              </li>
-            </ul>
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
-                🎉 Great! Your account is ready. In the next step, we'll implement the AI-powered task extraction and kanban board.
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[
+                "Review quarterly budget report by Friday 3pm",
+                "Schedule team meeting for next week",
+                "Call client about project timeline tomorrow",
+                "Prepare presentation slides for Monday meeting",
+                "Send invoice to ABC Company by end of day",
+                "Book flight for business trip next month"
+              ].map((example, index) => (
+                <button
+                  key={index}
+                  onClick={() => setTaskInput(example)}
+                  className="text-left p-3 border rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                >
+                  {example}
+                </button>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Get started with your task management</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <h3 className="font-medium">📧 Sync Gmail Tasks</h3>
-                <p className="text-sm text-gray-600 mt-1">Extract tasks from your recent emails</p>
+        {/* Voice Recognition Status */}
+        {!recognition && (
+          <Card className="border-yellow-200 bg-yellow-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 text-yellow-800">
+                <Mic className="h-5 w-5" />
+                <span className="font-medium">Voice input not available</span>
               </div>
-              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <h3 className="font-medium">📅 View Calendar</h3>
-                <p className="text-sm text-gray-600 mt-1">See your upcoming events and schedule</p>
-              </div>
-              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <h3 className="font-medium">🤖 AI Assistant</h3>
-                <p className="text-sm text-gray-600 mt-1">Get AI-powered task prioritization</p>
-              </div>
-              <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <h3 className="font-medium">📋 Kanban Board</h3>
-                <p className="text-sm text-gray-600 mt-1">Organize tasks visually</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              <p className="text-sm text-yellow-700 mt-1">
+                Voice recognition is not supported in your current browser. Try using Chrome, Edge, or Safari for voice input functionality.
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </DashboardLayout>
   );

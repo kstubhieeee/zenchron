@@ -92,10 +92,64 @@ To enable AI-powered email classification:
    GEMINI_API_KEY=your-actual-api-key-here
    ```
 
+## Slack Integration Setup
+
+To enable Slack integration:
+
+### 1. Create a Slack App
+
+1. Go to [https://api.slack.com/apps](https://api.slack.com/apps)
+2. Click "Create New App" → "From scratch"
+3. Enter app name: "Smart Auto-Prioritizer" (or your preferred name)
+4. Select your Slack workspace
+5. Click "Create App"
+
+### 2. Configure OAuth & Permissions
+
+1. In your app settings, go to "OAuth & Permissions"
+2. Under "Redirect URLs", add:
+   ```
+   http://localhost:3000/api/slack/callback
+   ```
+3. Under "Bot Token Scopes", add these scopes:
+   - `channels:read`
+   - `groups:read`
+   - `im:read`
+   - `mpim:read`
+   - `channels:history`
+   - `groups:history`
+   - `im:history`
+   - `mpim:history`
+   - `users:read`
+   - `team:read`
+
+### 3. Get App Credentials
+
+1. Go to "Basic Information" in your app settings
+2. Under "App Credentials", copy:
+   - Client ID
+   - Client Secret
+   - Signing Secret
+   - Verification Token
+3. Add these to your `.env.local` file:
+   ```
+   SLACK_CLIENT_ID=your-client-id
+   SLACK_CLIENT_SECRET=your-client-secret
+   SLACK_SIGNING_SECRET=your-signing-secret
+   SLACK_VERIFICATION_TOKEN=your-verification-token
+   ```
+
+### 4. Install App to Workspace
+
+1. Go to "Install App" in your app settings
+2. Click "Install to Workspace"
+3. Authorize the app
+
 ## Next Steps
 
-Once OAuth and Gemini AI are configured:
+Once OAuth, Gemini AI, and Slack are configured:
 - Gmail API integration to extract tasks from emails ✅
 - AI-powered email classification with Gemini ✅
+- Slack integration for message monitoring ✅
 - Google Calendar API integration for scheduling
 - Kanban board interface for task management ✅
