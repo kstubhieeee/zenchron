@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { RefreshCw, FileText, Database, Clock, Link as LinkIcon, CheckCircle, AlertCircle } from "lucide-react";
+import { RefreshCw, FileText, Database, Clock, Link as LinkIcon, CheckCircle, AlertCircle, Eye, X, ChevronRight, ChevronDown } from "lucide-react";
 
 interface NotionPage {
   id: string;
@@ -31,6 +31,33 @@ interface NotionResponse {
   };
 }
 
+interface NotionBlock {
+  id: string;
+  type: string;
+  content: string;
+  level?: number;
+  checked?: boolean;
+  language?: string;
+  icon?: any;
+  url?: string;
+  children?: NotionBlock[];
+  created_time: string;
+  last_edited_time: string;
+}
+
+interface PageContent {
+  page: {
+    id: string;
+    title: string;
+    url: string;
+    last_edited_time: string;
+    created_time: string;
+    properties: any;
+  };
+  content: NotionBlock[];
+  totalBlocks: number;
+}
+
 function NotionPageContent() {
   const [pages, setPages] = useState<NotionPage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +66,10 @@ function NotionPageContent() {
   const [mounted, setMounted] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const [selectedPage, setSelectedPage] = useState<NotionPage | null>(null);
+  const [pageContent, setPageContent] = useState<PageContent | null>(null);
+  const [isLoadingContent, setIsLoadingContent] = useState(false);
+  const [showContentModal, setShowContentModal] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -148,6 +179,193 @@ function NotionPageContent() {
 
   const getPageBadgeColor = (item: NotionPage) => {
     return item.object === 'database' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+  };
+
+  const fetchPageContent = async (page: NotionPage) => {
+    setSelectedPage(page);
+    setIsLoadingContent(true);
+    setShowContentModal(true);
+    
+    try {
+      const token = localStorage.getItem('notion_token');
+      const response = await fetch("/api/notion/page-content", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          pageId: page.id,
+          token: token
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch page content");
+      }
+
+      const data: PageContent = await response.json();
+      setPageContent(data);
+    } catch (error) {
+      console.error("Failed to fetch page content:", error);
+      alert("Failed to fetch page content. Please try again.");
+    } finally {
+      setIsLoadingContent(false);
+    }
+  };
+
+  const closeContentModal = () => {
+    setShowContentModal(false);
+    setSelectedPage(null);
+    setPageContent(null);
+  };
+
+  // Component to render individual blocks
+  const BlockRenderer = ({ block }: { block: NotionBlock }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    const renderBlockContent = () => {
+      switch (block.type) {
+        case 'heading_1':
+          return <h1 className="text-2xl font-bold text-gray-900 mb-2">{block.content}</h1>;
+        
+        case 'heading_2':
+          return <h2 className="text-xl font-semibold text-gray-800 mb-2">{block.content}</h2>;
+        
+        case 'heading_3':
+          return <h3 className="text-lg font-medium text-gray-700 mb-2">{block.content}</h3>;
+        
+        case 'paragraph':
+          return <p className="text-gray-700 leading-relaxed mb-2">{block.content || '\u00A0'}</p>;
+        
+        case 'bulleted_list_item':
+          return (
+            <div className="flex items-start gap-2 mb-1">
+              <span className="text-gray-400 mt-2">•</span>
+              <span className="text-gray-700">{block.content}</span>
+            </div>
+          );
+        
+        case 'numbered_list_item':
+          return (
+            <div className="flex items-start gap-2 mb-1">
+              <span className="text-gray-400 mt-2">1.</span>
+              <span className="text-gray-700">{block.content}</span>
+            </div>
+          );
+        
+        case 'to_do':
+          return (
+            <div className="flex items-start gap-2 mb-1">
+              <input 
+                type="checkbox" 
+                checked={block.checked} 
+                readOnly 
+                className="mt-1"
+              />
+              <span className={`text-gray-700 ${block.checked ? 'line-through text-gray-500' : ''}`}>
+                {block.content}
+              </span>
+            </div>
+          );
+        
+        case 'quote':
+          return (
+            <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 mb-2">
+              {block.content}
+            </blockquote>
+          );
+        
+        case 'code':
+          return (
+            <pre className="bg-gray-100 rounded p-3 text-sm font-mono overflow-x-auto mb-2">
+              <code>{block.content}</code>
+            </pre>
+          );
+        
+        case 'callout':
+          return (
+            <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-2">
+              <div className="flex items-start gap-2">
+                {block.icon && <span className="text-lg">{block.icon}</span>}
+                <span className="text-gray-700">{block.content}</span>
+              </div>
+            </div>
+          );
+        
+        case 'divider':
+          return <hr className="border-gray-300 my-4" />;
+        
+        case 'image':
+          return (
+            <div className="mb-4">
+              {block.url && (
+                <img 
+                  src={block.url} 
+                  alt={block.content} 
+                  className="max-w-full h-auto rounded"
+                />
+              )}
+              {block.content && block.content !== 'Image' && (
+                <p className="text-sm text-gray-500 mt-1">{block.content}</p>
+              )}
+            </div>
+          );
+        
+        case 'bookmark':
+        case 'embed':
+          return (
+            <div className="border border-gray-200 rounded p-3 mb-2">
+              <a 
+                href={block.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800"
+              >
+                {block.content || block.url}
+              </a>
+            </div>
+          );
+        
+        case 'toggle':
+          return (
+            <div className="mb-2">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="flex items-center gap-1 text-gray-700 hover:text-gray-900"
+              >
+                {isExpanded ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+                {block.content}
+              </button>
+            </div>
+          );
+        
+        default:
+          return (
+            <div className="text-gray-500 text-sm mb-2 italic">
+              {block.content}
+            </div>
+          );
+      }
+    };
+
+    return (
+      <div className="block-item">
+        {renderBlockContent()}
+        
+        {/* Render children if they exist and toggle is expanded */}
+        {block.children && block.children.length > 0 && (
+          <div className={`ml-4 ${block.type === 'toggle' && !isExpanded ? 'hidden' : ''}`}>
+            {block.children.map((childBlock) => (
+              <BlockRenderer key={childBlock.id} block={childBlock} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -318,6 +536,15 @@ function NotionPageContent() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
+                          <Button
+                            onClick={() => fetchPageContent(page)}
+                            size="sm"
+                            variant="outline"
+                            className="flex items-center gap-1"
+                          >
+                            <Eye className="h-3 w-3" />
+                            View Content
+                          </Button>
                           <a 
                             href={page.url} 
                             target="_blank" 
@@ -383,6 +610,56 @@ function NotionPageContent() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Content Modal */}
+        {showContentModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+              <div className="flex items-center justify-between p-4 border-b">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {selectedPage?.title || 'Untitled'}
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    {selectedPage?.object === 'database' ? 'Database' : 'Page'} • 
+                    Last edited {selectedPage ? formatTimestamp(selectedPage.last_edited_time) : ''}
+                  </p>
+                </div>
+                <Button
+                  onClick={closeContentModal}
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-1"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="p-4 overflow-y-auto max-h-[calc(90vh-120px)]">
+                {isLoadingContent ? (
+                  <div className="flex items-center justify-center py-12">
+                    <RefreshCw className="h-6 w-6 animate-spin text-gray-400" />
+                    <span className="ml-2 text-gray-500">Loading content...</span>
+                  </div>
+                ) : pageContent ? (
+                  <div className="space-y-4">
+                    <div className="text-sm text-gray-500 mb-4">
+                      {pageContent.totalBlocks} blocks found
+                    </div>
+                    {pageContent.content.map((block) => (
+                      <BlockRenderer key={block.id} block={block} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">No content available</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
