@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { RefreshCw, FileText, Database, Clock } from "lucide-react";
+import { RefreshCw, FileText, Database, Clock, Link as LinkIcon, CheckCircle, AlertCircle } from "lucide-react";
 
 interface NotionPage {
   id: string;
@@ -37,20 +37,77 @@ function NotionPageContent() {
   const [stats, setStats] = useState({ total: 0, databases: 0, pages: 0 });
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
 
   useEffect(() => {
     setMounted(true);
+    checkConnectionStatus();
   }, []);
 
+  const checkConnectionStatus = () => {
+    // Check URL params for OAuth success/error
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const error = urlParams.get('error');
+    const token = urlParams.get('token');
+    const workspace = urlParams.get('workspace');
+
+    if (success === 'true' && token) {
+      setIsConnected(true);
+      setConnectionStatus('connected');
+      // Store token securely (you might want to send this to your backend)
+      localStorage.setItem('notion_token', token);
+      if (workspace) {
+        localStorage.setItem('notion_workspace', workspace);
+      }
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (error) {
+      setConnectionStatus('disconnected');
+      console.error('Notion connection error:', error);
+    } else {
+      // Check if we have a stored token
+      const storedToken = localStorage.getItem('notion_token');
+      if (storedToken) {
+        setIsConnected(true);
+        setConnectionStatus('connected');
+      } else {
+        setConnectionStatus('disconnected');
+      }
+    }
+  };
+
+  const connectToNotion = () => {
+    window.location.href = '/api/notion/auth';
+  };
+
+  const disconnectNotion = () => {
+    localStorage.removeItem('notion_token');
+    localStorage.removeItem('notion_workspace');
+    setIsConnected(false);
+    setConnectionStatus('disconnected');
+    setPages([]);
+    setStats({ total: 0, databases: 0, pages: 0 });
+  };
+
   const fetchPages = async () => {
+    if (!isConnected) {
+      alert("Please connect to Notion first");
+      return;
+    }
+
     setIsLoading(true);
     try {
+      const token = localStorage.getItem('notion_token');
       const response = await fetch("/api/notion/pages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({}), // No token needed for internal integration
+        body: JSON.stringify({ 
+          token: token // Pass OAuth token if available, otherwise use internal
+        }),
       });
 
       if (!response.ok) {
@@ -99,17 +156,36 @@ function NotionPageContent() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Notion Integration</h1>
-            <p className="text-gray-600">Access your Notion pages and databases via internal integration</p>
+            <p className="text-gray-600">Connect your Notion workspace to access pages and databases</p>
           </div>
           <div className="flex gap-2">
-            <Button 
-              onClick={fetchPages} 
-              disabled={isLoading}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-              {isLoading ? "Fetching..." : "Fetch Pages"}
-            </Button>
+            {isConnected ? (
+              <>
+                <Button 
+                  onClick={fetchPages} 
+                  disabled={isLoading}
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+                  {isLoading ? "Fetching..." : "Fetch Pages"}
+                </Button>
+                <Button 
+                  onClick={disconnectNotion}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  Disconnect
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={connectToNotion}
+                className="flex items-center gap-2"
+              >
+                <LinkIcon className="h-4 w-4" />
+                Connect to Notion
+              </Button>
+            )}
           </div>
         </div>
 
@@ -122,10 +198,27 @@ function NotionPageContent() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-green-600 font-medium">Connected via Internal Integration</span>
-            </div>
+            {connectionStatus === 'checking' ? (
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"></div>
+                <span className="text-yellow-600 font-medium">Checking connection...</span>
+              </div>
+            ) : isConnected ? (
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="text-green-600 font-medium">
+                  Connected to {localStorage.getItem('notion_workspace') || 'Notion'}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+                <span className="text-red-600 font-medium">Not connected</span>
+                <Button onClick={connectToNotion} size="sm" className="ml-2">
+                  Connect Now
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -182,7 +275,7 @@ function NotionPageContent() {
           <CardHeader>
             <CardTitle>Accessible Content</CardTitle>
             <CardDescription>
-              Pages and databases shared with your internal integration
+              Pages and databases from your connected Notion workspace
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -191,7 +284,10 @@ function NotionPageContent() {
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500 mb-2">No pages found</p>
                 <p className="text-sm text-gray-400">
-                  Click "Fetch Pages" to load your Notion content, or make sure you've shared pages with your integration
+                  {isConnected 
+                    ? "Click 'Fetch Pages' to load your Notion content" 
+                    : "Connect to Notion to access your pages and databases"
+                  }
                 </p>
               </div>
             ) : (
@@ -260,28 +356,28 @@ function NotionPageContent() {
         {/* Integration Info */}
         <Card>
           <CardHeader>
-            <CardTitle>How Internal Integration Works</CardTitle>
+            <CardTitle>How OAuth Integration Works</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-semibold text-green-600 mb-2">What We Access:</h4>
                 <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Pages explicitly shared with the integration</li>
-                  <li>• Databases shared with the integration</li>
+                  <li>• Pages you select during authorization</li>
+                  <li>• Databases you grant access to</li>
                   <li>• Page titles and basic metadata</li>
                   <li>• Last edited timestamps</li>
                   <li>• Direct links to open in Notion</li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-600 mb-2">How to Share Content:</h4>
+                <h4 className="font-semibold text-gray-600 mb-2">How to Connect:</h4>
                 <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Go to any Notion page or database</li>
-                  <li>• Click "Share" in the top right</li>
-                  <li>• Search for your integration name</li>
-                  <li>• Grant access to the integration</li>
-                  <li>• Refresh this page to see new content</li>
+                  <li>• Click "Connect to Notion" above</li>
+                  <li>• Select pages/databases to share</li>
+                  <li>• Authorize the connection</li>
+                  <li>• Return here to access your content</li>
+                  <li>• You can disconnect anytime</li>
                 </ul>
               </div>
             </div>
