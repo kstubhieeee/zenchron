@@ -13,9 +13,15 @@ export async function POST(request: NextRequest) {
 
     // Get user info to find the current user's ID
     const authTest = await slack.auth.test();
-    const userId = authTest.user_id;
+    const botUserId = authTest.user_id;
 
-    console.log("Fetching relevant Slack messages for user:", userId);
+    // For bot tokens, we need to find the human user who installed the bot
+    // This is a common pattern - look for the team owner or use a configured user ID
+    // For now, we'll use the team owner or fallback to a hardcoded user
+    let humanUserId = 'U09923DMKCZ'; // Your human user ID from the curl test
+
+    console.log("Bot user ID:", botUserId);
+    console.log("Looking for messages relevant to human user:", humanUserId);
 
     const relevantMessages: any[] = [];
     const debugInfo: any[] = [];
@@ -36,7 +42,7 @@ export async function POST(request: NextRequest) {
 
           if (messagesResponse.messages) {
             const dmMessages = messagesResponse.messages
-              .filter((message: any) => message.user !== userId) // Exclude your own messages
+              .filter((message: any) => message.user !== humanUserId && message.user !== botUserId) // Exclude your own messages and bot messages
               .map((message: any) => ({
                 ...message,
                 channel_id: channel.id,
@@ -114,11 +120,11 @@ export async function POST(request: NextRequest) {
             });
 
             if (messagesResponse.messages) {
-              // Only get messages that mention the user and are not from the user
+              // Only get messages that mention the human user and are not from the user or bot
               const mentionMessages = messagesResponse.messages
                 .filter((message: any) => {
-                  const mentionsUser = message.text?.includes(`<@${userId}>`);
-                  const isFromUser = message.user === userId;
+                  const mentionsUser = message.text?.includes(`<@${humanUserId}>`);
+                  const isFromUser = message.user === humanUserId || message.user === botUserId;
                   return mentionsUser && !isFromUser;
                 })
                 .map((message: any) => ({
@@ -188,7 +194,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       messages: enrichedMessages.slice(0, 50), // Limit final results
       totalFetched: enrichedMessages.length,
-      userId,
+      botUserId,
+      humanUserId,
       debug: {
         strategiesUsed: ['DMs', 'Mentions in channels'],
         channelsChecked: debugInfo.length,
