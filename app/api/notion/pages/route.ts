@@ -7,21 +7,22 @@ const CACHE_DURATION = 300000; // 5 minutes cache for Notion
 
 export async function POST(request: NextRequest) {
   try {
-    const { token } = await request.json();
-
-    if (!token) {
-      return NextResponse.json({ error: "No Notion token provided" }, { status: 401 });
+    // Use internal integration secret instead of OAuth token
+    const internalSecret = process.env.NOTION_INTERNAL_SECRET;
+    
+    if (!internalSecret) {
+      return NextResponse.json({ error: "Notion internal secret not configured" }, { status: 500 });
     }
 
     // Check cache first
-    const cacheKey = `notion_pages_${token}`;
+    const cacheKey = `notion_pages_internal`;
     const cached = cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
       console.log("Returning cached Notion data");
       return NextResponse.json(cached.data);
     }
 
-    const notion = new Client({ auth: token });
+    const notion = new Client({ auth: internalSecret });
 
     console.log("Fetching Notion pages...");
 
