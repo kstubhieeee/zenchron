@@ -115,3 +115,11 @@ export const SlackIcon = ({ className = "", size = 24 }: IconProps) => (
         <circle cx="16" cy="16" r="1.5" fill="currentColor" fillOpacity="0.3" />
     </svg>
 );
+
+export const NotionIcon = ({ className = "", size = 24 }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
+        <path d="M7 7h10M7 11h8M7 15h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M17 7v10l-2-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
