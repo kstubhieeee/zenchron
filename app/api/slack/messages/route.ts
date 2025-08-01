@@ -52,60 +52,104 @@ export async function POST(request: NextRequest) {
             debugInfo.push({
               channel: 'DM',
               messageCount: dmMessages.length,
-              type: channel.is_mpim ? 'group_dm' : 'dm'
+              type: channel.is_mpim ? 'group_dm' : 'dm',
+              isMember: true // DMs don't have membership concept
+            });
+          } else {
+            debugInfo.push({
+              channel: 'DM',
+              messageCount: 0,
+              type: channel.is_mpim ? 'group_dm' : 'dm',
+              isMember: true,
+              note: 'No messages found'
             });
           }
         } catch (error) {
           console.error(`Error fetching DM messages:`, error);
+          debugInfo.push({
+            channel: 'DM',
+            messageCount: 0,
+            type: channel.is_mpim ? 'group_dm' : 'dm',
+            isMember: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
         }
       }
     }
 
     // Strategy 2: Get channels where user is mentioned
-    // Only check channels user is a member of to avoid permission issues
-    const memberChannels = await slack.conversations.list({
+    const allChannels = await slack.conversations.list({
       types: 'public_channel,private_channel',
       limit: 50
     });
 
-    if (memberChannels.channels) {
-      for (const channel of memberChannels.channels.filter(c => c.is_member)) {
+    if (allChannels.channels) {
+      for (const channel of allChannels.channels) {
         try {
-          const messagesResponse = await slack.conversations.history({
-            channel: channel.id!,
-            limit: 30 // Reduced limit for channels
-          });
+          // If not a member of a public channel, try to join it
+          if (!channel.is_member && !channel.is_private) {
+            console.log(`Trying to join channel: ${channel.name}`);
+            try {
+              await slack.conversations.join({ channel: channel.id! });
+              console.log(`Successfully joined channel: ${channel.name}`);
+              channel.is_member = true; // Update the local flag
+            } catch (joinError) {
+              console.log(`Failed to join channel ${channel.name}:`, joinError);
+              debugInfo.push({
+                channel: channel.name || channel.id,
+                messageCount: 0,
+                type: 'channel',
+                isMember: false,
+                error: 'Failed to join channel'
+              });
+              continue; // Skip this channel
+            }
+          }
 
-          if (messagesResponse.messages) {
-            // Only get messages that mention the user and are not from the user
-            const mentionMessages = messagesResponse.messages
-              .filter((message: any) => {
-                const mentionsUser = message.text?.includes(`<@${userId}>`);
-                const isFromUser = message.user === userId;
-                return mentionsUser && !isFromUser;
-              })
-              .map((message: any) => ({
-                ...message,
-                channel_id: channel.id,
-                channel_name: channel.name || 'Unknown Channel',
-                channel_type: 'channel',
-                mentions_user: true,
-                is_from_user: false,
-                is_dm: false,
-                priority: 'high' // Mentions are high priority
-              }));
+          // Only proceed if we're a member or it's a private channel we have access to
+          if (channel.is_member) {
+            const messagesResponse = await slack.conversations.history({
+              channel: channel.id!,
+              limit: 30 // Reduced limit for channels
+            });
 
-            if (mentionMessages.length > 0) {
+            if (messagesResponse.messages) {
+              // Only get messages that mention the user and are not from the user
+              const mentionMessages = messagesResponse.messages
+                .filter((message: any) => {
+                  const mentionsUser = message.text?.includes(`<@${userId}>`);
+                  const isFromUser = message.user === userId;
+                  return mentionsUser && !isFromUser;
+                })
+                .map((message: any) => ({
+                  ...message,
+                  channel_id: channel.id,
+                  channel_name: channel.name || 'Unknown Channel',
+                  channel_type: 'channel',
+                  mentions_user: true,
+                  is_from_user: false,
+                  is_dm: false,
+                  priority: 'high' // Mentions are high priority
+                }));
+
               relevantMessages.push(...mentionMessages);
               debugInfo.push({
-                channel: channel.name,
+                channel: channel.name || channel.id,
                 messageCount: mentionMessages.length,
-                type: 'channel_mentions'
+                type: 'channel_mentions',
+                isMember: true
               });
             }
           }
         } catch (error) {
           console.error(`Error fetching mentions from channel ${channel.name}:`, error);
+          debugInfo.push({
+            channel: channel.name || channel.id,
+            messageCount: 0,
+            type: 'channel',
+            isMember: channel.is_member || false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
         }
       }
     }
