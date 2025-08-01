@@ -20,52 +20,83 @@ export async function POST(request: NextRequest) {
     // Get list of channels
     const channelsResponse = await slack.conversations.list({
       types: 'public_channel,private_channel,mpim,im',
-      limit: 50
+      limit: 100
     });
 
+    console.log("Found channels:", channelsResponse.channels?.length || 0);
+
     if (!channelsResponse.channels) {
-      return NextResponse.json({ messages: [], totalFetched: 0 });
+      return NextResponse.json({ 
+        messages: [], 
+        totalFetched: 0,
+        debug: "No channels found"
+      });
     }
 
     const allMessages: any[] = [];
+    const debugInfo: any[] = [];
 
     // Fetch messages from each channel
-    for (const channel of channelsResponse.channels.slice(0, 10)) { // Limit to 10 channels for performance
+    for (const channel of channelsResponse.channels.slice(0, 20)) { // Increased limit
       try {
+        console.log(`Fetching from channel: ${channel.name || channel.id} (${channel.is_member ? 'member' : 'not member'})`);
+        
         const messagesResponse = await slack.conversations.history({
           channel: channel.id!,
-          limit: 20, // Limit messages per channel
+          limit: 50, // Increased limit
+        });
+
+        const channelMessageCount = messagesResponse.messages?.length || 0;
+        console.log(`Channel ${channel.name}: ${channelMessageCount} messages`);
+
+        debugInfo.push({
+          channel: channel.name || channel.id,
+          messageCount: channelMessageCount,
+          isMember: channel.is_member,
+          type: channel.is_im ? 'dm' : channel.is_mpim ? 'group_dm' : 'channel'
         });
 
         if (messagesResponse.messages) {
-          // Filter messages that mention the user or are replies to their messages
-          const relevantMessages = messagesResponse.messages.filter((message: any) => {
-            // Check if message mentions the user
-            const mentionsUser = message.text?.includes(`<@${userId}>`);
-            
-            // Check if it's a reply to user's message (simplified check)
-            const isReplyToUser = message.thread_ts && message.user !== userId;
-            
-            // Check if user is in a DM or group DM
-            const isDM = channel.is_im || channel.is_mpim;
-            
-            return mentionsUser || isReplyToUser || isDM;
-          });
-
-          // Add channel context to messages
-          const messagesWithContext = relevantMessages.map((message: any) => ({
+          // For debugging, let's include ALL messages first, then filter
+          const allChannelMessages = messagesResponse.messages.map((message: any) => ({
             ...message,
             channel_id: channel.id,
             channel_name: channel.name || 'Direct Message',
-            channel_type: channel.is_im ? 'dm' : channel.is_mpim ? 'group_dm' : 'channel'
+            channel_type: channel.is_im ? 'dm' : channel.is_mpim ? 'group_dm' : 'channel',
+            mentions_user: message.text?.includes(`<@${userId}>`),
+            is_from_user: message.user === userId,
+            is_dm: channel.is_im || channel.is_mpim
           }));
 
-          allMessages.push(...messagesWithContext);
+          // For now, let's include more messages to see what we're getting
+          const relevantMessages = allChannelMessages.filter((message: any) => {
+            // Include messages that:
+            // 1. Mention the user
+            // 2. Are in DMs
+            // 3. Are from recent activity (last 7 days)
+            // 4. Are in channels the user is a member of
+            
+            const mentionsUser = message.text?.includes(`<@${userId}>`);
+            const isDM = channel.is_im || channel.is_mpim;
+            const isRecentActivity = channel.is_member; // User is a member of this channel
+            const isFromOthers = message.user !== userId; // Not from the user themselves
+            
+            return mentionsUser || isDM || (isRecentActivity && isFromOthers);
+          });
+
+          console.log(`Relevant messages in ${channel.name}: ${relevantMessages.length}`);
+          allMessages.push(...relevantMessages);
         }
       } catch (error) {
         console.error(`Error fetching messages from channel ${channel.id}:`, error);
+        debugInfo.push({
+          channel: channel.name || channel.id,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
       }
     }
+
+    console.log("Total relevant messages found:", allMessages.length);
 
     // Sort messages by timestamp (newest first)
     allMessages.sort((a, b) => parseFloat(b.ts) - parseFloat(a.ts));
@@ -74,7 +105,7 @@ export async function POST(request: NextRequest) {
     const userIds = [...new Set(allMessages.map(msg => msg.user))];
     const usersInfo: any = {};
 
-    for (const uid of userIds) {
+    for (const uid of userIds.slice(0, 20)) { // Limit user info requests
       if (uid) {
         try {
           const userInfo = await slack.users.info({ user: uid });
@@ -94,15 +125,23 @@ export async function POST(request: NextRequest) {
     }));
 
     return NextResponse.json({
-      messages: enrichedMessages.slice(0, 50), // Limit to 50 most recent relevant messages
+      messages: enrichedMessages.slice(0, 100), // Increased limit for debugging
       totalFetched: enrichedMessages.length,
-      userId
+      userId,
+      debug: {
+        channelsChecked: debugInfo.length,
+        channelDetails: debugInfo,
+        totalChannels: channelsResponse.channels.length
+      }
     });
 
   } catch (error) {
     console.error("Slack messages error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch Slack messages" },
+      { 
+        error: "Failed to fetch Slack messages",
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

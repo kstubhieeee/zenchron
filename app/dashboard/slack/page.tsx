@@ -29,6 +29,11 @@ interface SlackResponse {
   messages: SlackMessage[];
   totalFetched: number;
   userId: string;
+  debug?: {
+    channelsChecked: number;
+    channelDetails: any[];
+    totalChannels: number;
+  };
 }
 
 function SlackPageContent() {
@@ -38,6 +43,7 @@ function SlackPageContent() {
   const [slackToken, setSlackToken] = useState<string | null>(null);
   const [teamName, setTeamName] = useState<string>("");
   const [stats, setStats] = useState({ total: 0, mentions: 0, dms: 0 });
+  const [debugInfo, setDebugInfo] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -112,6 +118,7 @@ function SlackPageContent() {
 
       const data: SlackResponse = await response.json();
       setMessages(data.messages);
+      setDebugInfo(data.debug);
       
       // Calculate stats
       const mentions = data.messages.filter(msg => msg.text.includes('<@')).length;
@@ -122,6 +129,8 @@ function SlackPageContent() {
         mentions,
         dms
       });
+
+      console.log("Debug info:", data.debug);
     } catch (error) {
       console.error("Failed to fetch messages:", error);
       alert("Failed to fetch Slack messages. Please try again.");
@@ -320,6 +329,40 @@ function SlackPageContent() {
           </>
         )}
 
+        {/* Debug Info */}
+        {debugInfo && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Debug Information</CardTitle>
+              <CardDescription>
+                Technical details about the Slack API response
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm"><strong>Total Channels:</strong> {debugInfo.totalChannels}</p>
+                  <p className="text-sm"><strong>Channels Checked:</strong> {debugInfo.channelsChecked}</p>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold mb-2">Channel Details:</h4>
+                  <div className="max-h-40 overflow-y-auto">
+                    {debugInfo.channelDetails?.map((channel: any, index: number) => (
+                      <div key={index} className="text-xs bg-gray-50 p-2 mb-1 rounded">
+                        <strong>{channel.channel}</strong> ({channel.type}) - 
+                        {channel.messageCount} messages - 
+                        {channel.isMember ? 'Member' : 'Not Member'}
+                        {channel.error && <span className="text-red-600"> - Error: {channel.error}</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Integration Info */}
         <Card>
           <CardHeader>
@@ -333,8 +376,8 @@ function SlackPageContent() {
                   <li>• Messages that mention you (@username)</li>
                   <li>• Direct messages sent to you</li>
                   <li>• Group messages you're part of</li>
-                  <li>• Replies to your messages in threads</li>
                   <li>• Messages in channels you're active in</li>
+                  <li>• Recent messages from other users</li>
                 </ul>
               </div>
               <div>
