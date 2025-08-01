@@ -94,7 +94,16 @@ export async function POST(request: NextRequest) {
     const responseData = {
       pages: allPages,
       totalFetched: allPages.length,
-      debug: debugInfo
+      debug: {
+        ...debugInfo,
+        searchDetails: {
+          totalIterations: Math.ceil(allPages.length / 20),
+          lastCursor: nextCursor,
+          hasMore: hasMore
+        },
+        tokenType: authToken?.startsWith('ntn_') ? 'internal' : 'oauth',
+        tokenPreview: authToken?.substring(0, 10) + '...'
+      }
     };
 
     // Cache the response
