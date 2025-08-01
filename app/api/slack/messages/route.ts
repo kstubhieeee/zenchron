@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { WebClient } from '@slack/web-api';
 
+// Simple in-memory cache to prevent rate limiting
+const cache = new Map();
+const CACHE_DURATION = 60000; // 1 minute cache
+
 export async function POST(request: NextRequest) {
   try {
     const { token } = await request.json();
 
     if (!token) {
       return NextResponse.json({ error: "No Slack token provided" }, { status: 401 });
+    }
+
+    // Check cache first
+    const cacheKey = `slack_messages_${token}`;
+    const cached = cache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      console.log("Returning cached data");
+      return NextResponse.json(cached.data);
     }
 
     const slack = new WebClient(token);
@@ -23,11 +35,11 @@ export async function POST(request: NextRequest) {
 
     // OPTIMIZED: Only check the main channel we know has messages
     const knownChannelId = 'C09923E7LC9'; // all-kstubhie channel
-    
+
     try {
       const messagesResponse = await slack.conversations.history({
         channel: knownChannelId,
-        limit: 20 // Small limit for speed
+        limit: 10 // Even smaller limit to avoid rate limits
       });
 
       if (messagesResponse.messages) {
@@ -95,7 +107,7 @@ export async function POST(request: NextRequest) {
       user_info: usersInfo[message.user] || null
     }));
 
-    return NextResponse.json({
+    const responseData = {
       messages: enrichedMessages,
       totalFetched: enrichedMessages.length,
       botUserId,
@@ -105,10 +117,31 @@ export async function POST(request: NextRequest) {
         channelsChecked: debugInfo.length,
         channelDetails: debugInfo
       }
+    };
+
+    // Cache the response
+    cache.set(cacheKey, {
+      data: responseData,
+      timestamp: Date.now()
     });
+
+    return NextResponse.json(responseData);
 
   } catch (error) {
     console.error("Slack messages error:", error);
+
+    // Check if it's a rate limit error
+    if (error instanceof Error && error.message.includes('rate limit')) {
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded",
+          details: "Please wait 60 seconds before trying again",
+          retryAfter: 60
+        },
+        { status: 429 }
+      );
+    }
+
     return NextResponse.json(
       {
         error: "Failed to fetch Slack messages",
