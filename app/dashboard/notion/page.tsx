@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { RefreshCw, FileText, Database, Clock, Link as LinkIcon, CheckCircle, AlertCircle, Eye, X, ChevronRight, ChevronDown } from "lucide-react";
+import { RefreshCw, FileText, Database, Clock, Link as LinkIcon, CheckCircle, AlertCircle, Eye, X, ChevronRight, ChevronDown, Zap, CheckSquare } from "lucide-react";
 
 interface NotionPage {
   id: string;
@@ -20,6 +20,9 @@ interface NotionPage {
   };
   object: string;
   properties?: any;
+  isProcessed?: boolean;
+  tasksExtracted?: number;
+  processedAt?: string;
 }
 
 interface NotionResponse {
@@ -70,6 +73,8 @@ function NotionPageContent() {
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [showContentModal, setShowContentModal] = useState(false);
+  const [extractingTasks, setExtractingTasks] = useState<string | null>(null);
+  const [processedPages, setProcessedPages] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     setMounted(true);
@@ -146,6 +151,10 @@ function NotionPageContent() {
       }
 
       const data: NotionResponse = await response.json();
+      
+      // Check which pages have been processed for task extraction
+      await checkProcessedPages(data.pages);
+      
       setPages(data.pages);
       setDebugInfo(data.debug);
       
@@ -165,6 +174,64 @@ function NotionPageContent() {
       alert("Failed to fetch Notion pages. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkProcessedPages = async (pages: NotionPage[]) => {
+    try {
+      const response = await fetch("/api/notion/processed-pages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          pageIds: pages.map(p => p.id)
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProcessedPages(new Set(data.processedPageIds));
+      }
+    } catch (error) {
+      console.error("Failed to check processed pages:", error);
+    }
+  };
+
+  const extractTasks = async (page: NotionPage) => {
+    setExtractingTasks(page.id);
+    try {
+      const token = localStorage.getItem('notion_token');
+      const response = await fetch("/api/notion/extract-tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          pageId: page.id,
+          token: token
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to extract tasks");
+      }
+
+      const data = await response.json();
+      
+      if (data.alreadyProcessed) {
+        alert(`This page was already processed on ${new Date(data.processedAt).toLocaleDateString()}. Found ${data.tasksCount} existing tasks.`);
+      } else {
+        alert(`Successfully extracted ${data.tasksExtracted} tasks from "${data.pageTitle}"!`);
+        // Mark this page as processed
+        setProcessedPages(prev => new Set([...prev, page.id]));
+      }
+    } catch (error) {
+      console.error("Failed to extract tasks:", error);
+      alert(`Failed to extract tasks: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setExtractingTasks(null);
     }
   };
 
@@ -441,7 +508,7 @@ function NotionPageContent() {
         </Card>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
@@ -484,6 +551,21 @@ function NotionPageContent() {
                 {stats.pages}
               </div>
               <p className="text-sm text-gray-500">Regular pages</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Zap className="h-5 w-5 text-orange-600" />
+                Tasks Extracted
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">
+                {processedPages.size}
+              </div>
+              <p className="text-sm text-gray-500">Pages processed</p>
             </CardContent>
           </Card>
         </div>
@@ -535,7 +617,7 @@ function NotionPageContent() {
                             {formatTimestamp(page.last_edited_time)}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <Button
                             onClick={() => fetchPageContent(page)}
                             size="sm"
@@ -545,6 +627,24 @@ function NotionPageContent() {
                             <Eye className="h-3 w-3" />
                             View Content
                           </Button>
+                          
+                          {processedPages.has(page.id) ? (
+                            <Badge variant="secondary" className="bg-green-100 text-green-800 flex items-center gap-1">
+                              <CheckSquare className="h-3 w-3" />
+                              Tasks Extracted
+                            </Badge>
+                          ) : (
+                            <Button
+                              onClick={() => extractTasks(page)}
+                              size="sm"
+                              disabled={extractingTasks === page.id}
+                              className="flex items-center gap-1 bg-orange-600 hover:bg-orange-700"
+                            >
+                              <Zap className={`h-3 w-3 ${extractingTasks === page.id ? "animate-spin" : ""}`} />
+                              {extractingTasks === page.id ? "Extracting..." : "Extract Tasks"}
+                            </Button>
+                          )}
+                          
                           <a 
                             href={page.url} 
                             target="_blank" 
@@ -579,6 +679,48 @@ function NotionPageContent() {
             </CardContent>
           </Card>
         )}
+
+        {/* Task Extraction Info */}
+        <Card>
+          <CardHeader>
+            <CardTitle>AI-Powered Task Extraction</CardTitle>
+            <CardDescription>
+              Extract actionable tasks from your Notion pages using AI
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold text-orange-600 mb-2">AI Automatically Extracts:</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• To-do items and checkboxes</li>
+                  <li>• Action items mentioned in text</li>
+                  <li>• Meeting notes with follow-ups</li>
+                  <li>• Project tasks and deliverables</li>
+                  <li>• Goals and objectives needing action</li>
+                  <li>• Deadlines and due dates from content</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-blue-600 mb-2">How It Works:</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Click "Extract Tasks" on any page</li>
+                  <li>• AI analyzes the page content</li>
+                  <li>• Tasks are categorized and prioritized</li>
+                  <li>• Tasks appear in your /dashboard/tasks</li>
+                  <li>• Pages are marked as processed</li>
+                  <li>• No duplicate extractions</li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-4 p-3 bg-yellow-50 rounded-md">
+              <p className="text-sm text-yellow-800">
+                <strong>Note:</strong> Once a page is processed, it won't be processed again to prevent duplicate tasks. 
+                Processed pages show a "Tasks Extracted" badge.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Integration Info */}
         <Card>
