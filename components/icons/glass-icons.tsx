@@ -123,3 +123,14 @@ export const NotionIcon = ({ className = "", size = 24 }: IconProps) => (
         <path d="M17 7v10l-2-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
 );
+
+export const GMeetIcon = ({ className = "", size = 24 }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+        <rect x="2" y="6" width="20" height="12" rx="3" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
+        <circle cx="8" cy="12" r="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.2" />
+        <circle cx="16" cy="12" r="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.2" />
+        <path d="M12 8v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M6 4l12 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M6 20l12 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+);

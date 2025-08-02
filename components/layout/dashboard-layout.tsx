@@ -17,6 +17,7 @@ import {
   RobotIcon,
   SlackIcon,
   NotionIcon,
+  GMeetIcon,
 } from "@/components/icons/glass-icons";
 import { MenuIcon, ChevronLeftIcon } from "@/components/icons/menu-icons";
 
@@ -58,6 +59,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { title: "Gmail Sync", url: "/dashboard/gmail", icon: GmailIcon },
     { title: "Slack", url: "/dashboard/slack", icon: SlackIcon },
     { title: "Notion", url: "/dashboard/notion", icon: NotionIcon },
+    { title: "Google Meet", url: "/dashboard/gmeet", icon: GMeetIcon },
     { title: "Calendar", url: "/dashboard/calendar", icon: CalendarIcon },
     { title: "Settings", url: "/dashboard/settings", icon: SettingsIcon },
   ];
