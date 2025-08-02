@@ -492,77 +492,7 @@ function SlackPageContent() {
         )}
 
         {/* Task Extraction Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>AI-Powered Task Extraction</CardTitle>
-            <CardDescription>
-              Extract actionable tasks from your Slack messages using AI
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold text-orange-600 mb-2">AI Automatically Extracts:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Direct requests and assignments</li>
-                  <li>• Action items from conversations</li>
-                  <li>• Follow-up tasks and reminders</li>
-                  <li>• Deadlines and due dates</li>
-                  <li>• Meeting decisions and next steps</li>
-                  <li>• Messages mentioning you with tasks</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-blue-600 mb-2">Smart Incremental Sync:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Only processes new messages since last sync</li>
-                  <li>• Tracks timestamp to avoid duplicates</li>
-                  <li>• First sync covers last 7 days</li>
-                  <li>• Tasks appear in your /dashboard/tasks</li>
-                  <li>• Categorizes and prioritizes automatically</li>
-                  <li>• Preserves message context and author</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-blue-50 rounded-md">
-              <p className="text-sm text-blue-800">
-                <strong>Incremental Sync:</strong> Each sync only processes messages newer than the last sync timestamp, 
-                ensuring no duplicates and efficient processing. Click "Extract Tasks" regularly to stay up-to-date.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Integration Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>How Slack Integration Works</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold text-green-600 mb-2">Messages We Show:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Messages that mention you (@username)</li>
-                  <li>• Direct messages sent to you</li>
-                  <li>• Group messages you're part of</li>
-                  <li>• Messages in channels you're active in</li>
-                  <li>• Recent messages from other users</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-600 mb-2">Privacy & Security:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Only shows messages relevant to you</li>
-                  <li>• Respects Slack's privacy settings</li>
-                  <li>• No messages are stored permanently</li>
-                  <li>• You can disconnect anytime</li>
-                  <li>• Uses official Slack API</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        
       </div>
     </DashboardLayout>
   );
