@@ -217,15 +217,7 @@ function CalendarPageContent() {
               <Zap className={`h-4 w-4 ${isAnalyzing ? "animate-spin" : ""}`} />
               {isAnalyzing ? "Analyzing..." : "Analyze Tasks"}
             </Button>
-            <Button 
-              onClick={testCalendarIntegration} 
-              disabled={isLoading}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <CheckCircle className="h-4 w-4" />
-              Test Integration
-            </Button>
+            
           </div>
         </div>
 
@@ -374,44 +366,7 @@ function CalendarPageContent() {
         </Card>
 
         {/* How It Works */}
-        <Card>
-          <CardHeader>
-            <CardTitle>How Calendar Integration Works</CardTitle>
-            <CardDescription>
-              Understanding the bidirectional sync between tasks and calendar events
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold text-blue-600 mb-2">Tasks → Calendar Events:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• AI analyzes tasks for scheduling needs</li>
-                  <li>• Suggests calendar events for meetings, calls, presentations</li>
-                  <li>• Creates events with proper timing and attendees</li>
-                  <li>• Links tasks to calendar events to prevent duplicates</li>
-                  <li>• Uses task metadata for event details</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-green-600 mb-2">Calendar Events → Tasks:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Syncs existing calendar events (last 30 days + next 30 days)</li>
-                  <li>• AI determines which events need action items</li>
-                  <li>• Creates preparation or follow-up tasks</li>
-                  <li>• Avoids duplicating personal/non-actionable events</li>
-                  <li>• Maintains sync state to prevent duplicates</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-yellow-50 rounded-md">
-              <p className="text-sm text-yellow-800">
-                <strong>Duplicate Prevention:</strong> The system uses unique identifiers and sync tracking 
-                to ensure tasks and calendar events are never duplicated, even across multiple syncs.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        
       </div>
     </DashboardLayout>
   );
