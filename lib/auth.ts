@@ -10,7 +10,7 @@ export const authOptions: NextAuthOptions = {
         params: {
           scope: [
             "openid",
-            "email", 
+            "email",
             "profile",
             "https://www.googleapis.com/auth/gmail.readonly",
             "https://www.googleapis.com/auth/gmail.modify",
@@ -21,6 +21,9 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  pages: {
+    signIn: '/auth/signin',
+  },
   callbacks: {
     async jwt({ token, account }) {
       // Persist the OAuth access_token to the token right after signin
@@ -35,8 +38,20 @@ export const authOptions: NextAuthOptions = {
       session.accessToken = token.accessToken as string
       return session
     },
-  },
-  pages: {
-    signIn: '/auth/signin',
+    async redirect({ url, baseUrl }) {
+      // Redirect to tasks page after successful login
+      if (url === baseUrl || url === `${baseUrl}/`) {
+        return `${baseUrl}/dashboard/tasks`
+      }
+      // Allow relative callback URLs
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`
+      }
+      // Allow callback URLs on the same origin
+      if (new URL(url).origin === baseUrl) {
+        return url
+      }
+      return `${baseUrl}/dashboard/tasks`
+    },
   },
 }

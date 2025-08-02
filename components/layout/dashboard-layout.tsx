@@ -7,7 +7,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  DashboardIcon,
   TasksIcon,
   AIIcon,
   GmailIcon,
@@ -30,10 +29,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(true); // Start collapsed
 
-  // Redirect to sign-in if not authenticated
+  // Redirect to sign-in if not authenticated, or to tasks if accessing old dashboard route
   React.useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/signin");
+    } else if (status === "authenticated" && typeof window !== 'undefined') {
+      // Redirect from old dashboard route to tasks
+      if (window.location.pathname === "/dashboard") {
+        router.push("/dashboard/tasks");
+      }
     }
   }, [status, router]);
 
@@ -53,7 +57,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   const menuItems = [
-    { title: "Dashboard", url: "/dashboard", icon: DashboardIcon },
     { title: "Tasks", url: "/dashboard/tasks", icon: TasksIcon },
     { title: "AI Assistant", url: "/dashboard/ai", icon: AIIcon },
     { title: "Gmail Sync", url: "/dashboard/gmail", icon: GmailIcon },

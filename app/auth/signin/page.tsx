@@ -14,7 +14,7 @@ export default function SignIn() {
     // Check if user is already signed in
     getSession().then((session) => {
       if (session) {
-        router.push('/dashboard');
+        router.push('/dashboard/tasks');
       }
     });
   }, [router]);
@@ -23,7 +23,7 @@ export default function SignIn() {
     setIsLoading(true);
     try {
       const result = await signIn('google', {
-        callbackUrl: '/dashboard',
+        callbackUrl: '/dashboard/tasks',
         redirect: false,
       });
       
