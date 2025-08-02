@@ -5,7 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { Download, Video, FileText, Zap, Copy, CheckCircle, AlertCircle, ExternalLink, Settings, Webhook } from "lucide-react";
+import { Download, Video, FileText, Zap, Copy, CheckCircle, AlertCircle, ExternalLink, Settings, Webhook, User } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 interface MeetingRecord {
   _id: string;
@@ -17,19 +18,21 @@ interface MeetingRecord {
 }
 
 function GMeetPageContent() {
+  const { data: session } = useSession();
   const [meetings, setMeetings] = useState<MeetingRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState({ totalMeetings: 0, totalTasks: 0 });
   const [mounted, setMounted] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     // Set the webhook URL based on current domain
     if (typeof window !== 'undefined') {
       const baseUrl = window.location.origin;
-      setWebhookUrl(`${baseUrl}/api/gmeet/webhook`);
+      setWebhookUrl(`${baseUrl}/api/gmeet/webhook-public`);
     }
     loadMeetings();
   }, []);
@@ -63,6 +66,45 @@ function GMeetPageContent() {
     }
   };
 
+  const copyUserEmail = async () => {
+    try {
+      if (session?.user?.email) {
+        await navigator.clipboard.writeText(session.user.email);
+        setEmailCopied(true);
+        setTimeout(() => setEmailCopied(false), 2000);
+      }
+    } catch (error) {
+      console.error("Failed to copy user email:", error);
+    }
+  };
+
+  const testWebhook = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/gmeet/test-webhook", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Test webhook successful! Created ${data.webhookResponse.tasksExtracted || 0} tasks.`);
+        // Refresh meetings to show the test meeting
+        loadMeetings();
+      } else {
+        const errorData = await response.json();
+        alert(`Test webhook failed: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error("Test webhook failed:", error);
+      alert("Test webhook failed. Check console for details.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const downloadExtension = () => {
     // Create a zip file download link for the extension
     const link = document.createElement('a');
@@ -87,14 +129,25 @@ function GMeetPageContent() {
             <h1 className="text-3xl font-bold text-gray-900">Google Meet Integration</h1>
             <p className="text-gray-600">Extract tasks from meeting transcripts using TranscripTonic extension</p>
           </div>
-          <Button 
-            onClick={loadMeetings} 
-            disabled={isLoading}
-            className="flex items-center gap-2"
-          >
-            <Video className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-            {isLoading ? "Loading..." : "Refresh Meetings"}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={loadMeetings} 
+              disabled={isLoading}
+              className="flex items-center gap-2"
+            >
+              <Video className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+              {isLoading ? "Loading..." : "Refresh Meetings"}
+            </Button>
+            <Button 
+              onClick={testWebhook} 
+              disabled={isLoading}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Zap className="h-4 w-4" />
+              Test Webhook
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -174,44 +227,111 @@ function GMeetPageContent() {
               <div className="border-l-4 border-green-500 pl-4">
                 <h3 className="font-semibold text-green-700 mb-2">Step 2: Configure Webhook URL</h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  Copy this webhook URL and paste it in the TranscripTonic extension settings:
+                  Copy this webhook URL and your user email for the TranscripTonic extension settings:
                 </p>
-                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                  <code className="flex-1 text-sm font-mono">{webhookUrl}</code>
-                  <Button
-                    onClick={copyWebhookUrl}
-                    size="sm"
-                    variant="outline"
-                    className="flex items-center gap-1"
-                  >
-                    {copied ? (
-                      <>
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-4 w-4" />
-                        Copy
-                      </>
-                    )}
-                  </Button>
+                
+                {/* Webhook URL */}
+                <div className="mb-3">
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">Webhook URL:</label>
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                    <code className="flex-1 text-sm font-mono">{webhookUrl}</code>
+                    <Button
+                      onClick={copyWebhookUrl}
+                      size="sm"
+                      variant="outline"
+                      className="flex items-center gap-1"
+                    >
+                      {copied ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4" />
+                          Copy
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
+
+                {/* User Email */}
+                <div className="mb-3">
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">Your User Email:</label>
+                  <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
+                    <User className="h-4 w-4 text-blue-600" />
+                    <code className="flex-1 text-sm font-mono text-blue-800">
+                      {session?.user?.email || 'Not logged in'}
+                    </code>
+                    <Button
+                      onClick={copyUserEmail}
+                      size="sm"
+                      variant="outline"
+                      className="flex items-center gap-1"
+                      disabled={!session?.user?.email}
+                    >
+                      {emailCopied ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4" />
+                          Copy
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="mt-3 space-y-2">
                   <p className="text-sm text-gray-600">To configure the webhook:</p>
                   <ol className="text-sm text-gray-600 space-y-1 ml-4">
                     <li>1. Click on the TranscripTonic extension icon in Chrome</li>
                     <li>2. Go to the "Webhooks" or "Settings" section</li>
                     <li>3. Paste the webhook URL above</li>
-                    <li>4. Enable "Automatically post transcript after each meeting"</li>
-                    <li>5. Choose "Simple webhook body" for easier processing</li>
+                    <li>4. <strong>Important:</strong> Add your user email to the webhook request body</li>
+                    <li>5. Enable "Automatically post transcript after each meeting"</li>
+                    <li>6. Choose "Simple webhook body" for easier processing</li>
                   </ol>
+                </div>
+                
+                <div className="mt-3 p-3 bg-yellow-50 rounded-md">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Important:</strong> You need to modify the TranscripTonic extension to include your user email 
+                    in the webhook request. Add <code>"userEmail": "{session?.user?.email}"</code> to the webhook body.
+                  </p>
                 </div>
               </div>
 
-              {/* Step 3: Usage */}
+              {/* Step 3: Modify Extension */}
+              <div className="border-l-4 border-orange-500 pl-4">
+                <h3 className="font-semibold text-orange-700 mb-2">Step 3: Modify Extension (Required)</h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  You need to modify the TranscripTonic extension to include your user email:
+                </p>
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">Edit the file <code>/transcriptonic/extension/background.js</code>:</p>
+                  <div className="bg-gray-900 text-green-400 p-3 rounded-lg text-xs font-mono overflow-x-auto">
+                    <div className="mb-2 text-gray-400">// Find the postTranscriptToWebhook function and modify the webhookData:</div>
+                    <div className="text-yellow-400">webhookData = &#123;</div>
+                    <div className="ml-4">webhookBodyType: "simple",</div>
+                    <div className="ml-4">meetingTitle: meeting.meetingTitle || meeting.title || "",</div>
+                    <div className="ml-4">meetingStartTimestamp: new Date(meeting.meetingStartTimestamp).toLocaleString("default", timeFormat).toUpperCase(),</div>
+                    <div className="ml-4">meetingEndTimestamp: new Date(meeting.meetingEndTimestamp).toLocaleString("default", timeFormat).toUpperCase(),</div>
+                    <div className="ml-4">transcript: getTranscriptString(meeting.transcript),</div>
+                    <div className="ml-4">chatMessages: getChatMessagesString(meeting.chatMessages),</div>
+                    <div className="ml-4 text-green-400"><strong>userEmail: "{session?.user?.email || 'your-email@example.com'}", // ADD THIS LINE</strong></div>
+                    <div className="text-yellow-400">&#125;</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 4: Usage */}
               <div className="border-l-4 border-purple-500 pl-4">
-                <h3 className="font-semibold text-purple-700 mb-2">Step 3: Usage</h3>
+                <h3 className="font-semibold text-purple-700 mb-2">Step 4: Usage</h3>
                 <p className="text-sm text-gray-600 mb-3">
                   Once configured, the extension will automatically work:
                 </p>

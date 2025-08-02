@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { authOptions } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
 import { TaskStatus } from "@/lib/models/Task";
 
@@ -9,20 +7,20 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(request: NextRequest) {
     try {
-        // Check if user is authenticated
-        const session = await getServerSession(authOptions);
-        
-        if (!session?.user?.email) {
-            console.log("No authenticated user found, skipping webhook processing");
-            return NextResponse.json({
-                error: "No authenticated user found",
-                message: "Please log in to process meeting transcripts"
-            }, { status: 401 });
-        }
-
         const body = await request.json();
         
-        console.log("Received Google Meet transcript webhook for user:", session.user.email, {
+        // Get user email from request body or headers
+        const userEmail = body.userEmail || request.headers.get('x-user-email');
+        
+        if (!userEmail) {
+            console.log("No user email provided in webhook request");
+            return NextResponse.json({
+                error: "User email is required",
+                message: "Please include userEmail in the request body or x-user-email header"
+            }, { status: 400 });
+        }
+
+        console.log("Received Google Meet transcript webhook for user:", userEmail, {
             meetingTitle: body.meetingTitle,
             webhookBodyType: body.webhookBodyType,
             transcriptLength: body.transcript?.length || 0,
@@ -35,8 +33,13 @@ export async function POST(request: NextRequest) {
             }, { status: 500 });
         }
 
-        // Use the authenticated user's email
-        const userEmail = session.user.email;
+        // Verify user exists in our system (optional check)
+        const client = await clientPromise;
+        const db = client.db("zenchron");
+        const usersCollection = db.collection("users");
+        
+        // Check if user exists (you might want to create a users collection or check against your auth system)
+        // For now, we'll just proceed with any email provided
 
         // Process the transcript based on webhook body type
         let transcriptText = '';
@@ -153,8 +156,6 @@ Focus on extracting meaningful, actionable tasks rather than general discussion 
             console.log(`AI extracted ${extractedTasks.length} tasks from meeting "${body.meetingTitle}"`);
 
             // Store tasks in MongoDB
-            const client = await clientPromise;
-            const db = client.db("zenchron");
             const tasksCollection = db.collection("tasks");
             const meetingsCollection = db.collection("gmeet_meetings");
 
@@ -216,6 +217,7 @@ Focus on extracting meaningful, actionable tasks rather than general discussion 
             return NextResponse.json({
                 success: true,
                 meetingTitle: body.meetingTitle,
+                userEmail: userEmail,
                 tasksExtracted: tasksCreated,
                 tasks: createdTasks,
                 message: `Successfully processed meeting and extracted ${tasksCreated} tasks`
