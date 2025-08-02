@@ -681,77 +681,7 @@ function NotionPageContent() {
         )}
 
         {/* Task Extraction Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>AI-Powered Task Extraction</CardTitle>
-            <CardDescription>
-              Extract actionable tasks from your Notion pages using AI
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold text-orange-600 mb-2">AI Automatically Extracts:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• To-do items and checkboxes</li>
-                  <li>• Action items mentioned in text</li>
-                  <li>• Meeting notes with follow-ups</li>
-                  <li>• Project tasks and deliverables</li>
-                  <li>• Goals and objectives needing action</li>
-                  <li>• Deadlines and due dates from content</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-blue-600 mb-2">How It Works:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Click "Extract Tasks" on any page</li>
-                  <li>• AI analyzes the page content</li>
-                  <li>• Tasks are categorized and prioritized</li>
-                  <li>• Tasks appear in your /dashboard/tasks</li>
-                  <li>• Pages are marked as processed</li>
-                  <li>• No duplicate extractions</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-yellow-50 rounded-md">
-              <p className="text-sm text-yellow-800">
-                <strong>Note:</strong> Once a page is processed, it won't be processed again to prevent duplicate tasks. 
-                Processed pages show a "Tasks Extracted" badge.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Integration Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>How OAuth Integration Works</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold text-green-600 mb-2">What We Access:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Pages you select during authorization</li>
-                  <li>• Databases you grant access to</li>
-                  <li>• Page titles and basic metadata</li>
-                  <li>• Last edited timestamps</li>
-                  <li>• Direct links to open in Notion</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-600 mb-2">How to Connect:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Click "Connect to Notion" above</li>
-                  <li>• Select pages/databases to share</li>
-                  <li>• Authorize the connection</li>
-                  <li>• Return here to access your content</li>
-                  <li>• You can disconnect anytime</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        
 
         {/* Content Modal */}
         {showContentModal && (
