@@ -281,14 +281,7 @@ function SlackPageContent() {
                 <Zap className={`h-4 w-4 ${extractingTasks ? "animate-spin" : ""}`} />
                 {extractingTasks ? "Extracting..." : "Extract Tasks"}
               </Button>
-              <Button 
-                onClick={testSlackConnection} 
-                disabled={isLoading || extractingTasks}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                Test Connection
-              </Button>
+              
               <Button variant="outline" onClick={disconnectSlack}>
                 Disconnect
               </Button>
@@ -458,38 +451,7 @@ function SlackPageContent() {
         )}
 
         {/* Debug Info */}
-        {debugInfo && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Debug Information</CardTitle>
-              <CardDescription>
-                Technical details about the Slack API response
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm"><strong>Total Channels:</strong> {debugInfo.totalChannels}</p>
-                  <p className="text-sm"><strong>Channels Checked:</strong> {debugInfo.channelsChecked}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold mb-2">Channel Details:</h4>
-                  <div className="max-h-40 overflow-y-auto">
-                    {debugInfo.channelDetails?.map((channel: any, index: number) => (
-                      <div key={index} className="text-xs bg-gray-50 p-2 mb-1 rounded">
-                        <strong>{channel.channel}</strong> ({channel.type}) - 
-                        {channel.messageCount} messages - 
-                        {channel.isMember ? 'Member' : 'Not Member'}
-                        {channel.error && <span className="text-red-600"> - Error: {channel.error}</span>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+       
 
         {/* Task Extraction Info */}
         
