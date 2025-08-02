@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface IconProps {
     className?: string;
@@ -35,20 +36,15 @@ export const AIIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const GmailIcon = ({ className = "", size = 24 }: IconProps) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-        <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
-        <path d="M2 8l8.5 5a2 2 0 003 0L22 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+        <Image src="/gmail.svg" alt="Gmail" width={size * 0.8} height={size * 0.8} />
+    </div>
 );
 
 export const CalendarIcon = ({ className = "", size = 24 }: IconProps) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-        <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
-        <path d="M8 2v4M16 2v4M3 10h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="8" cy="14" r="1" fill="currentColor" />
-        <circle cx="12" cy="14" r="1" fill="currentColor" />
-        <circle cx="16" cy="14" r="1" fill="currentColor" />
-    </svg>
+    <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+        <Image src="/calendar.svg" alt="Google Calendar" width={size * 0.8} height={size * 0.8} />
+    </div>
 );
 
 export const SettingsIcon = ({ className = "", size = 24 }: IconProps) => (
