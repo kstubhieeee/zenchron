@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { RefreshCw, MessageSquare, Users, Hash, User, Clock } from "lucide-react";
+import { RefreshCw, MessageSquare, Users, Hash, User, Clock, Zap } from "lucide-react";
 
 interface SlackMessage {
   ts: string;
@@ -43,9 +43,11 @@ function SlackPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [slackToken, setSlackToken] = useState<string | null>(null);
   const [teamName, setTeamName] = useState<string>("");
-  const [stats, setStats] = useState({ total: 0, mentions: 0, dms: 0 });
+  const [stats, setStats] = useState({ total: 0, mentions: 0, dms: 0, tasksExtracted: 0 });
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
+  const [extractingTasks, setExtractingTasks] = useState(false);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -70,6 +72,8 @@ function SlackPageContent() {
       localStorage.setItem('slack_team', team);
       // Clean up URL
       window.history.replaceState({}, '', '/dashboard/slack');
+      // Load sync state after connection
+      loadSyncState();
     } else if (error) {
       console.error('Slack OAuth error:', error);
       alert(`Slack connection failed: ${error}`);
@@ -81,9 +85,29 @@ function SlackPageContent() {
         setIsConnected(true);
         setSlackToken(storedToken);
         setTeamName(storedTeam);
+        // Load sync state for existing connection
+        loadSyncState();
       }
     }
   }, [mounted]);
+
+  const loadSyncState = async () => {
+    try {
+      const response = await fetch("/api/slack/sync-state");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.hasSynced) {
+          setStats(prev => ({
+            ...prev,
+            tasksExtracted: data.tasksExtracted
+          }));
+          setLastSync(data.lastSync ? new Date(data.lastSync) : null);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load sync state:", error);
+    }
+  };
 
   const connectSlack = () => {
     window.location.href = '/api/slack/auth';
@@ -94,9 +118,53 @@ function SlackPageContent() {
     setSlackToken(null);
     setTeamName("");
     setMessages([]);
+    setStats({ total: 0, mentions: 0, dms: 0, tasksExtracted: 0 });
+    setLastSync(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('slack_token');
       localStorage.removeItem('slack_team');
+    }
+  };
+
+  const extractTasks = async () => {
+    if (!slackToken) return;
+
+    setExtractingTasks(true);
+    try {
+      const response = await fetch("/api/slack/extract-tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: slackToken }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to extract tasks");
+      }
+
+      const data = await response.json();
+      
+      setStats(prev => ({
+        ...prev,
+        tasksExtracted: prev.tasksExtracted + data.tasksExtracted
+      }));
+      
+      setLastSync(new Date());
+      
+      if (data.tasksExtracted > 0) {
+        alert(`Successfully extracted ${data.tasksExtracted} tasks from ${data.messagesProcessed} Slack messages!`);
+      } else {
+        alert(`No new tasks found. Processed ${data.messagesProcessed} messages.`);
+      }
+      
+      console.log("Task extraction results:", data);
+    } catch (error) {
+      console.error("Failed to extract tasks:", error);
+      alert(`Failed to extract tasks: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setExtractingTasks(false);
     }
   };
 
@@ -153,7 +221,8 @@ function SlackPageContent() {
       setStats({
         total: data.totalFetched,
         mentions,
-        dms
+        dms,
+        tasksExtracted: stats.tasksExtracted // Keep existing count
       });
 
       console.log("Debug info:", data.debug);
@@ -198,15 +267,23 @@ function SlackPageContent() {
             <div className="flex gap-2">
               <Button 
                 onClick={fetchMessages} 
-                disabled={isLoading}
+                disabled={isLoading || extractingTasks}
                 className="flex items-center gap-2"
               >
                 <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
                 {isLoading ? "Fetching..." : "Fetch Messages"}
               </Button>
               <Button 
+                onClick={extractTasks} 
+                disabled={isLoading || extractingTasks}
+                className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700"
+              >
+                <Zap className={`h-4 w-4 ${extractingTasks ? "animate-spin" : ""}`} />
+                {extractingTasks ? "Extracting..." : "Extract Tasks"}
+              </Button>
+              <Button 
                 onClick={testSlackConnection} 
-                disabled={isLoading}
+                disabled={isLoading || extractingTasks}
                 variant="outline"
                 className="flex items-center gap-2"
               >
@@ -250,7 +327,7 @@ function SlackPageContent() {
         {isConnected && (
           <>
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center gap-2">
@@ -293,6 +370,23 @@ function SlackPageContent() {
                     {stats.dms}
                   </div>
                   <p className="text-sm text-gray-500">DMs and group messages</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-orange-600" />
+                    Tasks Extracted
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-orange-600">
+                    {stats.tasksExtracted}
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    {lastSync ? `Last sync: ${lastSync.toLocaleTimeString()}` : 'Never synced'}
+                  </p>
                 </CardContent>
               </Card>
             </div>
@@ -396,6 +490,48 @@ function SlackPageContent() {
             </CardContent>
           </Card>
         )}
+
+        {/* Task Extraction Info */}
+        <Card>
+          <CardHeader>
+            <CardTitle>AI-Powered Task Extraction</CardTitle>
+            <CardDescription>
+              Extract actionable tasks from your Slack messages using AI
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold text-orange-600 mb-2">AI Automatically Extracts:</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Direct requests and assignments</li>
+                  <li>• Action items from conversations</li>
+                  <li>• Follow-up tasks and reminders</li>
+                  <li>• Deadlines and due dates</li>
+                  <li>• Meeting decisions and next steps</li>
+                  <li>• Messages mentioning you with tasks</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-blue-600 mb-2">Smart Incremental Sync:</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Only processes new messages since last sync</li>
+                  <li>• Tracks timestamp to avoid duplicates</li>
+                  <li>• First sync covers last 7 days</li>
+                  <li>• Tasks appear in your /dashboard/tasks</li>
+                  <li>• Categorizes and prioritizes automatically</li>
+                  <li>• Preserves message context and author</li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-4 p-3 bg-blue-50 rounded-md">
+              <p className="text-sm text-blue-800">
+                <strong>Incremental Sync:</strong> Each sync only processes messages newer than the last sync timestamp, 
+                ensuring no duplicates and efficient processing. Click "Extract Tasks" regularly to stay up-to-date.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Integration Info */}
         <Card>
