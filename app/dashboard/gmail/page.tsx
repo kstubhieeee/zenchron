@@ -211,12 +211,7 @@ export default function GmailPage() {
           <CardContent>
             {activeTab === 'new' ? (
               <div>
-                <div className="mb-4 p-3 bg-blue-50 rounded-md">
-                  <p className="text-sm text-blue-800">
-                    <strong>New Emails:</strong> These emails don't have the "ZenchronProcessed" label yet. 
-                    When you sync, AI will analyze them and create tasks automatically.
-                  </p>
-                </div>
+                
                 {newEmails.length === 0 ? (
                   <div className="text-center py-12">
                     <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
