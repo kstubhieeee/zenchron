@@ -69,6 +69,82 @@ export function KanbanBoard({ onAddTask, refreshTrigger }: KanbanBoardProps) {
     }
   };
 
+  const createCalendarEvent = async (taskId: string) => {
+    const task = tasks.find(t => t._id === taskId);
+    if (!task) {
+      alert('Task not found!');
+      return;
+    }
+
+    try {
+      console.log(`Creating calendar event for task: ${task.title}`);
+      
+      // Always create a calendar event - no AI analysis needed for basic functionality
+      const suggestedStartTime = task.scheduledTime || task.dueDate || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const suggestedDuration = task.estimatedDuration || 60;
+      
+      // Create smart event title
+      let eventTitle = task.title;
+      if (!eventTitle.toLowerCase().includes('meeting') && 
+          !eventTitle.toLowerCase().includes('call') && 
+          !eventTitle.toLowerCase().includes('presentation') &&
+          !eventTitle.toLowerCase().includes('interview') &&
+          !eventTitle.toLowerCase().includes('demo')) {
+        eventTitle = `Work on: ${task.title}`;
+      }
+
+      // Create the calendar event directly
+      const createResponse = await fetch('/api/calendar/create-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          taskId: taskId,
+          title: eventTitle,
+          description: task.description || `Dedicated time to work on: ${task.title}\n\nTask Type: ${task.type}\nPriority: ${task.priority}/5\nEstimated Duration: ${task.estimatedDuration || 60} minutes`,
+          startTime: suggestedStartTime,
+          endTime: new Date(new Date(suggestedStartTime).getTime() + suggestedDuration * 60 * 1000).toISOString(),
+          attendees: []
+        })
+      });
+
+      if (createResponse.ok) {
+        const eventData = await createResponse.json();
+        const eventTime = new Date(suggestedStartTime).toLocaleString();
+        
+        alert(`✅ Calendar event created successfully!\n\n📅 Event: ${eventTitle}\n🕐 Time: ${eventTime}\n⏱️ Duration: ${suggestedDuration} minutes\n\n🔗 You can view it in Google Calendar.\n\nEvent ID: ${eventData.eventId}`);
+        
+        // Update the task to reflect it has a calendar event
+        setTasks(prev => prev.map(t => 
+          t._id === taskId 
+            ? { 
+                ...t, 
+                metadata: { 
+                  ...t.metadata, 
+                  hasCalendarEvent: true, 
+                  googleEventId: eventData.eventId,
+                  eventTitle: eventTitle,
+                  eventStartTime: suggestedStartTime
+                } 
+              }
+            : t
+        ));
+        
+        console.log(`Successfully created calendar event for task: ${task.title}`);
+      } else {
+        const errorData = await createResponse.json();
+        if (errorData.error === "Event already exists for this task") {
+          alert('📅 A calendar event already exists for this task!\n\nCheck your Google Calendar to view the existing event.');
+        } else {
+          console.error('Calendar event creation failed:', errorData);
+          alert(`❌ Failed to create calendar event: ${errorData.error}\n\nPlease try again or check your Google Calendar permissions.`);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to create calendar event:', error);
+      alert('❌ Failed to create calendar event due to a network or system error.\n\nPlease check your internet connection and try again.');
+    }
+  };
+
   // Group tasks by type for better organization
   const groupedTasks = React.useMemo(() => {
     const filtered = filter === 'all' ? tasks : tasks.filter(task => task.type === filter);
@@ -207,6 +283,7 @@ export function KanbanBoard({ onAddTask, refreshTrigger }: KanbanBoardProps) {
                     task={task}
                     onStatusChange={updateTaskStatus}
                     onDelete={deleteTask}
+                    onCreateCalendarEvent={createCalendarEvent}
                   />
                 ))}
               </div>

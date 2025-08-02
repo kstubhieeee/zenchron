@@ -14,16 +14,18 @@ import {
   Pause, 
   Check, 
   Trash2,
-  AlertCircle
+  AlertCircle,
+  CalendarPlus
 } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
   onStatusChange: (taskId: string, status: TaskStatus) => void;
   onDelete: (taskId: string) => void;
+  onCreateCalendarEvent?: (taskId: string) => void;
 }
 
-export function TaskCard({ task, onStatusChange, onDelete }: TaskCardProps) {
+export function TaskCard({ task, onStatusChange, onDelete, onCreateCalendarEvent }: TaskCardProps) {
   const [showActions, setShowActions] = useState(false);
   
   const typeConfig = TaskTypeConfig[task.type];
@@ -133,6 +135,18 @@ export function TaskCard({ task, onStatusChange, onDelete }: TaskCardProps) {
                   >
                     <Pause className="h-3 w-3" />
                     Set Waiting
+                  </button>
+                )}
+                {onCreateCalendarEvent && !task.metadata?.hasCalendarEvent && (
+                  <button
+                    onClick={() => {
+                      onCreateCalendarEvent(task._id!);
+                      setShowActions(false);
+                    }}
+                    className="w-full px-3 py-1 text-left text-sm hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <CalendarPlus className="h-3 w-3" />
+                    Create Event
                   </button>
                 )}
                 <button
