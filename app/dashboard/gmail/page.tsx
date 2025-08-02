@@ -261,45 +261,7 @@ export default function GmailPage() {
           </CardContent>
         </Card>
 
-        {/* AI Processing Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>How AI Email Processing Works</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold text-green-600 mb-2">AI Automatically:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Identifies work-related emails</li>
-                  <li>• Extracts actionable tasks from content</li>
-                  <li>• Categorizes tasks by type and priority</li>
-                  <li>• Sets due dates from email context</li>
-                  <li>• Adds tasks to your task management system</li>
-                  <li>• Labels processed emails to avoid duplicates</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-blue-600 mb-2">Task Types Detected:</h4>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• 🔁 Follow-up tasks and responses needed</li>
-                  <li>• 💡 Quick wins and simple actions</li>
-                  <li>• 🔥 High priority and urgent items</li>
-                  <li>• 🧠 Deep work and complex projects</li>
-                  <li>• ⏳ Deadline-based tasks with due dates</li>
-                  <li>• 📅 Scheduled events and meetings</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-yellow-50 rounded-md">
-              <p className="text-sm text-yellow-800">
-                <strong>Important:</strong> Once an email is processed, it gets the "ZenchronProcessed" label 
-                and will NOT be processed again. This prevents duplicate tasks from being created. 
-                Processed emails appear in the "Already Processed" tab for reference only.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        
       </div>
     </DashboardLayout>
   );

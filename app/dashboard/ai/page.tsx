@@ -310,23 +310,7 @@ function AIPageContent() {
               <Brain className={`h-4 w-4 ${isAnalyzing ? "animate-pulse" : ""}`} />
               {isAnalyzing ? "Analyzing..." : "Analyze Tasks"}
             </Button>
-            <Button 
-              onClick={testWithMockData} 
-              disabled={isAnalyzing}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Target className="h-4 w-4" />
-              Test with Mock Data
-            </Button>
-            <Button 
-              onClick={setTestData} 
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Zap className="h-4 w-4" />
-              Set Test Data
-            </Button>
+            
           </div>
         </div>
 
@@ -701,22 +685,7 @@ function AIPageContent() {
         )}
 
         {/* Debug Info - Remove this after fixing */}
-        {process.env.NODE_ENV === 'development' && (
-          <Card className="border-yellow-200 bg-yellow-50">
-            <CardHeader>
-              <CardTitle className="text-sm">Debug Info</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xs space-y-1">
-                <p>Analysis: {analysis ? 'Loaded' : 'Not loaded'}</p>
-                <p>Execution Plan: {executionPlan ? 'Loaded' : 'Not loaded'}</p>
-                <p>Timetable: {timetable.length} entries</p>
-                <p>Priority Matrix: {priorityMatrix ? 'Loaded' : 'Not loaded'}</p>
-                <p>Last Analysis: {lastAnalysis || 'None'}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+       
 
         {/* Last Analysis Info */}
         {lastAnalysis && (

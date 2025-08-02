@@ -383,40 +383,7 @@ export default function LandingPage() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-20 bg-gray-50">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Empower Your Workflow with AI</h2>
-              <p className="text-lg text-gray-600">
-                Ask your AI Agent for real-time collaboration, seamless integrations, and actionable insights to
-                streamline your operations.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {testimonials.map((testimonial, index) => (
-                <Card key={index} className="bg-white">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-3 mb-4">
-                      <Image
-                        src={testimonial.avatar || "/placeholder.svg"}
-                        width={40}
-                        height={40}
-                        alt={testimonial.name}
-                        className="rounded-full"
-                      />
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                        <p className="text-sm text-gray-500">{testimonial.role}</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-700 text-sm leading-relaxed">{testimonial.content}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
+        
 
         {/* FAQ Section */}
         <section id="contact" className="py-20 bg-white">
