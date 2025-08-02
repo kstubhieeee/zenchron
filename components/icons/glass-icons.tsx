@@ -26,13 +26,9 @@ export const TasksIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const AIIcon = ({ className = "", size = 24 }: IconProps) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
-        <path d="M8 12h8M12 8v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="9" cy="9" r="1.5" fill="currentColor" fillOpacity="0.3" />
-        <circle cx="15" cy="9" r="1.5" fill="currentColor" fillOpacity="0.3" />
-        <path d="M9 15h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
+    <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+    <Image src="/gemini.svg" alt="Gmail" width={size * 0.8} height={size * 0.8} />
+</div>
 );
 
 export const GmailIcon = ({ className = "", size = 24 }: IconProps) => (
@@ -102,31 +98,19 @@ export const RobotIcon = ({ className = "", size = 24 }: IconProps) => (
 );
 
 export const SlackIcon = ({ className = "", size = 24 }: IconProps) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-        <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
-        <path d="M8 12h8M12 8v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="8" cy="8" r="1.5" fill="currentColor" fillOpacity="0.3" />
-        <circle cx="16" cy="8" r="1.5" fill="currentColor" fillOpacity="0.3" />
-        <circle cx="8" cy="16" r="1.5" fill="currentColor" fillOpacity="0.3" />
-        <circle cx="16" cy="16" r="1.5" fill="currentColor" fillOpacity="0.3" />
-    </svg>
+    <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+    <Image src="/slack.svg" alt="Gmail" width={size * 0.8} height={size * 0.8} />
+</div>
 );
 
 export const NotionIcon = ({ className = "", size = 24 }: IconProps) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
-        <path d="M7 7h10M7 11h8M7 15h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M17 7v10l-2-2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+        <Image src="/notion.svg" alt="Gmail" width={size * 0.8} height={size * 0.8} />
+    </div>
 );
 
 export const GMeetIcon = ({ className = "", size = 24 }: IconProps) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-        <rect x="2" y="6" width="20" height="12" rx="3" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.1" />
-        <circle cx="8" cy="12" r="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.2" />
-        <circle cx="16" cy="12" r="2" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.2" />
-        <path d="M12 8v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M6 4l12 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M6 20l12 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
+    <div className={`flex items-center justify-center ${className}`} style={{ width: size, height: size }}>
+        <Image src="/gmeet.svg" alt="Gmail" width={size * 0.8} height={size * 0.8} />
+    </div>
 );
