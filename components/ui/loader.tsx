@@ -12,7 +12,7 @@ export function LoaderOne({ className }: { className?: string }) {
           <img 
             src="/zenn.png" 
             alt="Zenchron" 
-            className="h-6 w-6 object-contain opacity-80"
+            className="h-6 w-6 opacity-80 rounded-md"
           />
         </div>
       </div>

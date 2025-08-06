@@ -71,15 +71,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex">
       {/* Sidebar */}
-      <div className={`${isCollapsed ? 'w-16' : 'w-64'} bg-white/80 backdrop-blur-sm shadow-xl border-r border-gray-200/50 flex flex-col transition-all duration-300 ease-in-out`}>
+      <div className={`${isCollapsed ? 'w-20' : 'w-64'} bg-white/80 backdrop-blur-sm shadow-xl border-r border-gray-200/50 flex flex-col transition-all duration-300 ease-in-out`}>
         {/* Header */}
         <div className={`p-4 border-b ${isCollapsed ? 'flex justify-center' : ''}`}>
           <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-lg">
+            <div className="flex  items-center justify-center rounded-xl bg-white shadow-lg">
               <img 
                 src="/zenn.png" 
                 alt="Zenchron Logo" 
-                className="h-7 w-7 object-contain"
+                className="h-10 w-10 rounded-md"
               />
             </div>
             {!isCollapsed && (

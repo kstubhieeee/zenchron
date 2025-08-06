@@ -19,11 +19,11 @@ export default function TermsOfUsePage() {
           </Link>
           {/* Zenchron Logo */}
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-lg">
+            <div className="flex  items-center justify-center rounded-xl bg-white shadow-lg">
               <img 
                 src="/zenn.png" 
                 alt="Zenchron Logo" 
-                className="h-8 w-8 object-contain"
+                className="h-10 w-10 rounded-md"
               />
             </div>
             <div>

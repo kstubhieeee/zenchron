@@ -138,11 +138,7 @@ export const MultiStepLoader = ({
             <LoaderCore value={currentState} loadingStates={loadingStates} />
             {/* Subtle Zenchron branding */}
             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex items-center gap-2 opacity-60">
-              <img 
-                src="/zenn.png" 
-                alt="Zenchron" 
-                className="h-5 w-5 object-contain"
-              />
+             
               <span className="text-sm text-gray-600 dark:text-gray-400">Zenchron</span>
             </div>
           </div>

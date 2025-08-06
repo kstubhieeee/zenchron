@@ -115,11 +115,11 @@ export function EnhancedNavbar() {
                 >
                     <div className="flex h-[56px] items-center justify-between p-4">
                         <Link href="/" className="flex items-center gap-3 group">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-lg group-hover:shadow-xl transition-all duration-300">
+                            <div className="flex  items-center justify-center rounded-lg bg-white shadow-lg group-hover:shadow-xl transition-all duration-300">
                                 <img 
                                     src="/zenn.png" 
                                     alt="Zenchron Logo" 
-                                    className="h-6 w-6 object-contain"
+                                    className="h-10 w-10 rounded-md"
                                 />
                             </div>
                             <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
@@ -213,11 +213,11 @@ export function EnhancedNavbar() {
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center justify-between">
                                     <Link href="/" className="flex items-center gap-3">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-lg">
+                                        <div className="flex  items-center justify-center rounded-lg bg-white shadow-lg">
                                             <img 
                                                 src="/zenn.png" 
                                                 alt="Zenchron Logo" 
-                                                className="h-6 w-6 object-contain"
+                                                className="h-10 w-10 rounded-md"
                                             />
                                         </div>
                                         <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">

@@ -179,11 +179,7 @@ export function SyncDialog({ isOpen, onClose, success, title, message, details }
                 transition={{ delay: 0.8 }}
                 className="mt-4 flex items-center justify-center gap-2 opacity-60"
               >
-                <img 
-                  src="/zenn.png" 
-                  alt="Zenchron" 
-                  className="h-4 w-4 object-contain"
-                />
+               
                 <span className="text-xs text-gray-500">Zenchron</span>
               </motion.div>
             </div>

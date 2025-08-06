@@ -338,11 +338,11 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-lg">
+                <div className="flex  items-center justify-center rounded-lg bg-white shadow-lg">
                   <img 
                     src="/zenn.png" 
                     alt="Zenchron Logo" 
-                    className="h-6 w-6 object-contain"
+                    className="h-10 w-10 rounded-md"
                   />
                 </div>
                 <span className="text-xl font-bold">Zenchron</span>

@@ -47,11 +47,11 @@ export default function SignIn() {
         <CardHeader className="text-center space-y-4">
           {/* Zenchron Logo */}
           <div className="flex justify-center mb-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
+            <div className="flex  items-center justify-center rounded-2xl bg-white shadow-lg">
               <img 
                 src="/zenn.png" 
                 alt="Zenchron Logo" 
-                className="h-12 w-12 object-contain"
+                className="h-12 w-12 rounded-md"
               />
             </div>
           </div>
