@@ -252,7 +252,7 @@ export function KanbanBoard({ onAddTask, refreshTrigger }: KanbanBoardProps) {
             return (
               <div 
                 key={column.id} 
-                className="rounded-lg shadow-sm p-6"
+                className="rounded-lg  p-6"
                 style={{ backgroundColor: 'white', border: '1px solid #e5e7eb' }}
               >
                 <div className="text-2xl font-bold text-gray-900">
@@ -277,7 +277,7 @@ export function KanbanBoard({ onAddTask, refreshTrigger }: KanbanBoardProps) {
                 <div key={type} className="space-y-3">
                   {/* Type Header */}
                   <div 
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg shadow-sm"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg "
                     style={{ backgroundColor: 'white', border: '1px solid #e5e7eb' }}
                   >
                     {getTypeIcon(type as TaskType)}

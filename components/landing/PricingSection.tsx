@@ -47,7 +47,7 @@ function PricingTabs({ activeTab, setActiveTab, className }: TabsProps) {
                     {activeTab === tab && (
                         <motion.div
                             layoutId="active-tab"
-                            className="absolute inset-0 rounded-md bg-white shadow-sm"
+                            className="absolute inset-0 rounded-md bg-white "
                             transition={{
                                 duration: 0.2,
                                 type: "spring",
@@ -112,8 +112,8 @@ export function PricingSection({ title, description, pricingItems }: PricingSect
                         <div
                             key={tier.name}
                             className={cn(
-                                "rounded-xl bg-white flex flex-col transition-all duration-300 hover:shadow-lg",
-                                "p-6 min-h-[480px] relative shadow-sm"
+                                "rounded-xl bg-white flex flex-col transition-all duration-300 hover:",
+                                "p-6 min-h-[480px] relative "
                             )}
                         >
                             {/* Plan name and badge */}

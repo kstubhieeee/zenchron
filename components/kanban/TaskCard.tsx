@@ -162,7 +162,7 @@ export function TaskCard({ task, onStatusChange, onDelete, onCreateCalendarEvent
 
   return (
     <div 
-      className={`relative rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group ${
+      className={`relative rounded-lg  hover: transition-all duration-200 overflow-hidden group ${
         task.status === TaskStatus.DONE ? 'opacity-75' : ''
       }`}
       style={{
@@ -206,7 +206,7 @@ export function TaskCard({ task, onStatusChange, onDelete, onCreateCalendarEvent
               <MoreVertical className="h-3 w-3" />
             </Button>
             {showActions && (
-              <div className="absolute right-0 top-6 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1 min-w-[140px]">
+              <div className="absolute right-0 top-6 bg-white border border-gray-200 rounded-lg  z-20 py-1 min-w-[140px]">
                 {task.status !== TaskStatus.DONE && (
                   <>
                     <button

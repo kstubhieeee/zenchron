@@ -71,11 +71,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex">
       {/* Sidebar */}
-      <div className={`${isCollapsed ? 'w-20' : 'w-64'} bg-white/80 backdrop-blur-sm shadow-xl border-r border-gray-200/50 flex flex-col transition-all duration-300 ease-in-out`}>
+      <div className={`${isCollapsed ? 'w-20' : 'w-64'} bg-white/80 backdrop-blur-sm  border-r border-gray-200/50 flex flex-col transition-all duration-300 ease-in-out`}>
         {/* Header */}
         <div className={`p-4 border-b ${isCollapsed ? 'flex justify-center' : ''}`}>
           <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-            <div className="flex  items-center justify-center rounded-xl bg-white shadow-lg">
+            <div className="flex  items-center justify-center rounded-xl bg-white ">
               <img 
                 src="/zenn.png" 
                 alt="Zenchron Logo" 
@@ -120,7 +120,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="p-4 border-t bg-gray-50/50">
           {isCollapsed ? (
             <div className="flex flex-col items-center gap-2">
-              <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
+              <Avatar className="h-8 w-8 ring-2 ring-white ">
                 <AvatarImage src={session.user?.image || ""} alt={session.user?.name || ""} />
                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs font-semibold">
                   {session.user?.name?.charAt(0) || "U"}
@@ -138,7 +138,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9 ring-2 ring-white shadow-sm">
+              <Avatar className="h-9 w-9 ring-2 ring-white ">
                 <AvatarImage src={session.user?.image || ""} alt={session.user?.name || ""} />
                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-semibold">
                   {session.user?.name?.charAt(0) || "U"}
@@ -169,7 +169,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/50 px-6 py-4">
+        <header className="bg-white/80 backdrop-blur-sm  border-b border-gray-200/50 px-6 py-4">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"

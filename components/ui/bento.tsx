@@ -56,7 +56,7 @@ export default function Bento() {
                                 </div>
                             </div>
                         </div>
-                        <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm ring-1 ring-black/5 lg:rounded-l-3xl"></div>
+                        <div className="pointer-events-none absolute inset-px rounded-lg  ring-1 ring-black/5 lg:rounded-l-3xl"></div>
                     </div>
 
                     {/* Real-time Collaboration */}
@@ -95,7 +95,7 @@ export default function Bento() {
                                 </div>
                             </div>
                         </div>
-                        <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm ring-1 ring-black/5 max-lg:rounded-t-3xl"></div>
+                        <div className="pointer-events-none absolute inset-px rounded-lg  ring-1 ring-black/5 max-lg:rounded-t-3xl"></div>
                     </div>
 
                     {/* Smart Integrations */}
@@ -115,28 +115,28 @@ export default function Bento() {
                             </div>
                             <div className="flex flex-1 items-center max-lg:py-6 lg:pb-2">
                                 <div className="grid grid-cols-3 gap-4 w-full px-8 sm:px-10">
-                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center shadow-sm hover:scale-110 transition-transform cursor-pointer border border-gray-200">
+                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center  hover:scale-110 transition-transform cursor-pointer border border-gray-200">
                                         <Image src="/slack.svg" alt="Slack" width={32} height={32} />
                                     </div>
-                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center shadow-sm hover:scale-110 transition-transform cursor-pointer border border-gray-200">
+                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center  hover:scale-110 transition-transform cursor-pointer border border-gray-200">
                                         <Image src="/gmail.svg" alt="Gmail" width={32} height={32} />
                                     </div>
-                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center shadow-sm hover:scale-110 transition-transform cursor-pointer border border-gray-200">
+                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center  hover:scale-110 transition-transform cursor-pointer border border-gray-200">
                                         <Image src="/notion.svg" alt="Notion" width={32} height={32} />
                                     </div>
-                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center shadow-sm hover:scale-110 transition-transform cursor-pointer border border-gray-200">
+                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center  hover:scale-110 transition-transform cursor-pointer border border-gray-200">
                                         <Image src="/calendar.svg" alt="Google Calendar" width={32} height={32} />
                                     </div>
-                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center shadow-sm hover:scale-110 transition-transform cursor-pointer border border-gray-200">
+                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center  hover:scale-110 transition-transform cursor-pointer border border-gray-200">
                                         <Image src="/gmeet.svg" alt="Google Meet" width={32} height={32} />
                                     </div>
-                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center shadow-sm hover:scale-110 transition-transform cursor-pointer border border-gray-200">
+                                    <div className="bg-white rounded-lg h-16 w-16 flex items-center justify-center  hover:scale-110 transition-transform cursor-pointer border border-gray-200">
                                         <Image src="/gemini.svg" alt="Google Gemini" width={32} height={32} />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm ring-1 ring-black/5"></div>
+                        <div className="pointer-events-none absolute inset-px rounded-lg  ring-1 ring-black/5"></div>
                     </div>
 
                     {/* Advanced Analytics */}
@@ -177,7 +177,7 @@ export default function Bento() {
                                                         stroke="#3B82F6"
                                                         strokeWidth="2"
                                                         fill="none"
-                                                        className="drop-shadow-sm"
+                                                        className="drop-"
                                                     />
                                                     <circle cx="150" cy="50" r="3" fill="#3B82F6" />
                                                 </svg>
@@ -197,7 +197,7 @@ export default function Bento() {
                                 </div>
                             </div>
                         </div>
-                        <div className="pointer-events-none absolute inset-px rounded-lg shadow-sm ring-1 ring-black/5 max-lg:rounded-b-3xl lg:rounded-r-3xl"></div>
+                        <div className="pointer-events-none absolute inset-px rounded-lg  ring-1 ring-black/5 max-lg:rounded-b-3xl lg:rounded-r-3xl"></div>
                     </div>
                 </div>
             </div>

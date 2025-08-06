@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { RefreshCw, MessageSquare, Users, Hash, User, Clock, Zap } from "lucide-react";
+import { RefreshCw, MessageSquare, Users, Hash, User, Clock, Zap, CheckCircle, AlertCircle, Sparkles, ArrowRight, Activity } from 'lucide-react';
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { LoaderOne } from "@/components/ui/loader";
 import { useSyncDialog } from "@/hooks/use-sync-dialog";
@@ -72,7 +72,6 @@ function SlackPageContent() {
   useEffect(() => {
     if (!mounted) return;
 
-    // Check for OAuth callback parameters
     const urlParams = new URLSearchParams(window.location.search);
     const success = urlParams.get('success');
     const team = urlParams.get('team');
@@ -83,25 +82,20 @@ function SlackPageContent() {
       setIsConnected(true);
       setSlackToken(token);
       setTeamName(team);
-      // Store in localStorage for persistence
       localStorage.setItem('slack_token', token);
       localStorage.setItem('slack_team', team);
-      // Clean up URL
       window.history.replaceState({}, '', '/dashboard/slack');
-      // Load sync state after connection
       loadSyncState();
     } else if (error) {
       console.error('Slack OAuth error:', error);
       alert(`Slack connection failed: ${error}`);
     } else {
-      // Check localStorage for existing connection
       const storedToken = localStorage.getItem('slack_token');
       const storedTeam = localStorage.getItem('slack_team');
       if (storedToken && storedTeam) {
         setIsConnected(true);
         setSlackToken(storedToken);
         setTeamName(storedTeam);
-        // Load sync state for existing connection
         loadSyncState();
       }
     }
@@ -183,7 +177,6 @@ function SlackPageContent() {
         );
       }
       
-      console.log("Task extraction results:", data);
     } catch (error) {
       console.error("Failed to extract tasks:", error);
       showError(
@@ -193,30 +186,6 @@ function SlackPageContent() {
       );
     } finally {
       setExtractingTasks(false);
-    }
-  };
-
-  const testSlackConnection = async () => {
-    if (!slackToken) return;
-
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/slack/test", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: slackToken }),
-      });
-
-      const data = await response.json();
-      console.log("Test results:", data);
-      alert(`Test completed! Check console for details. Found ${data.channels?.length || 0} channels.`);
-    } catch (error) {
-      console.error("Test failed:", error);
-      alert("Test failed. Check console for details.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -238,25 +207,27 @@ function SlackPageContent() {
       }
 
       const data: SlackResponse = await response.json();
-      console.log("Received data:", data); // Debug log
       setMessages(data.messages);
       setDebugInfo(data.debug);
       
-      // Calculate stats
       const mentions = data.messages.filter(msg => msg.text.includes('<@')).length;
       const dms = data.messages.filter(msg => msg.channel_type === 'dm' || msg.channel_type === 'group_dm').length;
       
-      setStats({
+      setStats(prev => ({
+        ...prev,
         total: data.totalFetched,
         mentions,
         dms,
-        tasksExtracted: stats.tasksExtracted // Keep existing count
-      });
+        tasksExtracted: prev.tasksExtracted
+      }));
 
-      console.log("Debug info:", data.debug);
     } catch (error) {
       console.error("Failed to fetch messages:", error);
-      alert("Failed to fetch Slack messages. Please try again.");
+      showError(
+        'Message Fetch Failed',
+        'Failed to fetch Slack messages.',
+        'Please check your connection and try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -277,196 +248,253 @@ function SlackPageContent() {
 
   const getChannelBadgeColor = (type: string) => {
     switch (type) {
-      case 'dm': return 'bg-blue-100 text-blue-800';
-      case 'group_dm': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-green-100 text-green-800';
+      case 'dm': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'group_dm': return 'bg-purple-100 text-purple-800 border-purple-200';
+      default: return 'bg-green-100 text-green-800 border-green-200';
     }
+  };
+
+  const extractSenderName = (from: string) => {
+    return from || 'Unknown User';
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Slack Integration</h1>
-            <p className="text-gray-600">View messages that mention you or require your attention</p>
-          </div>
-          {isConnected ? (
-            <div className="flex gap-2">
-              <Button 
-                onClick={fetchMessages} 
-                disabled={isLoading || extractingTasks}
-                className="flex items-center gap-2"
-              >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-                {isLoading ? "Fetching..." : "Fetch Messages"}
-              </Button>
-              <Button 
-                onClick={() => setExtractingTasks(true)} 
-                disabled={isLoading || extractingTasks}
-                className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700"
-              >
-                <Zap className="h-4 w-4" />
-                Extract Tasks
-              </Button>
-              
-              <Button variant="outline" onClick={disconnectSlack}>
-                Disconnect
-              </Button>
+      <div className="space-y-8">
+        {/* Enhanced Header */}
+        <div className="relative overflow-hidden rounded-2xl bg-blue-600 p-8 text-white">
+          <div className="relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
+                  <MessageSquare className="h-8 w-8" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold mb-2">Slack Intelligence</h1>
+                  <p className="text-purple-100 text-lg">Transform conversations into actionable tasks</p>
+                </div>
+              </div>
+              {isConnected ? (
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={fetchMessages} 
+                    disabled={isLoading || extractingTasks}
+                    className="bg-white/10 hover:bg-white/20 border-white/20 backdrop-blur-sm"
+                    variant="outline"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                    {isLoading ? "Fetching..." : "Fetch Messages"}
+                  </Button>
+                  <Button 
+                    onClick={extractTasks} 
+                    disabled={isLoading || extractingTasks}
+                    className="bg-white text-purple-600 hover:bg-gray-100"
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    Extract Tasks
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={disconnectSlack}
+                    className="border-red-300/50 text-red-200 hover:bg-red-500/20"
+                  >
+                    Disconnect
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  onClick={connectSlack} 
+                  className="bg-white text-blue-600 hover:bg-gray-100"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Connect to Slack
+                </Button>
+              )}
             </div>
-          ) : (
-            <Button onClick={connectSlack} className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Connect to Slack
-            </Button>
-          )}
+          </div>  
         </div>
 
-        {/* Connection Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
-              Connection Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isConnected ? (
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-green-600 font-medium">Connected to {teamName}</span>
+        {/* Enhanced Connection Status */}
+        <Card className="border ">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className={`p-3 rounded-xl ${isConnected ? 'bg-green-100' : 'bg-red-100'}`}>
+                  {isConnected ? (
+                    <CheckCircle className="h-6 w-6 text-green-600" />
+                  ) : (
+                    <AlertCircle className="h-6 w-6 text-red-600" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    {isConnected ? `Connected to ${teamName}` : 'Not connected to Slack'}
+                  </h3>
+                  <p className="text-gray-600">
+                    {isConnected ? 'Ready to analyze messages and extract tasks' : 'Connect your workspace to get started'}
+                  </p>
+                </div>
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                <span className="text-gray-600">Not connected</span>
-              </div>
-            )}
+              {!isConnected && (
+                <Button onClick={connectSlack} className="bg-blue-600 text-white hover:bg-purple-700">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Connect Now
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
 
         {isConnected && (
           <>
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-blue-600" />
-                    Total Messages
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {stats.total}
+            {/* Enhanced Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card className="border-0  bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-blue-100 rounded-xl">
+                      <MessageSquare className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-blue-700">{stats.total}</div>
+                      <div className="text-blue-600 font-medium">Total Messages</div>
+                      <div className="text-blue-500 text-sm">Relevant to you</div>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-500">Relevant to you</p>
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Users className="h-5 w-5 text-green-600" />
-                    Mentions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-600">
-                    {stats.mentions}
+              <Card className="border-0  bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-green-100 rounded-xl">
+                      <Users className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-green-700">{stats.mentions}</div>
+                      <div className="text-green-600 font-medium">Mentions</div>
+                      <div className="text-green-500 text-sm">Messages mentioning you</div>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-500">Messages mentioning you</p>
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <User className="h-5 w-5 text-purple-600" />
-                    Direct Messages
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-purple-600">
-                    {stats.dms}
+              <Card className="border-0  bg-gradient-to-br from-purple-50 to-violet-50 hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-purple-100 rounded-xl">
+                      <User className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-purple-700">{stats.dms}</div>
+                      <div className="text-purple-600 font-medium">Direct Messages</div>
+                      <div className="text-purple-500 text-sm">DMs and group messages</div>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-500">DMs and group messages</p>
                 </CardContent>
               </Card>
               
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-orange-600" />
-                    Tasks Extracted
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-orange-600">
-                    {stats.tasksExtracted}
+              <Card className="border-0  bg-gradient-to-br from-orange-50 to-amber-50 hover:shadow-xl transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-orange-100 rounded-xl">
+                      <Zap className="h-6 w-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-orange-700">{stats.tasksExtracted}</div>
+                      <div className="text-orange-600 font-medium">Tasks Extracted</div>
+                      <div className="text-orange-500 text-sm">
+                        {lastSync ? `Last sync: ${lastSync.toLocaleTimeString()}` : 'Never synced'}
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-500">
-                    {lastSync ? `Last sync: ${lastSync.toLocaleTimeString()}` : 'Never synced'}
-                  </p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Messages List */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Messages</CardTitle>
-                <CardDescription>
-                  Messages that mention you or require your attention
-                </CardDescription>
+            {/* Enhanced Messages List */}
+            <Card className="border-0 shadow-xl">
+              <CardHeader className="pb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <Activity className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Recent Messages</CardTitle>
+                      <CardDescription>Messages that mention you or require your attention</CardDescription>
+                    </div>
+                  </div>
+                  {messages.length > 0 && (
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-3 py-1">
+                      {messages.length} messages
+                    </Badge>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {messages.length === 0 ? (
-                  <div className="text-center py-12">
-                    <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 mb-2">No messages found</p>
-                    <p className="text-sm text-gray-400">
-                      Click "Fetch Messages" to load your recent Slack messages
+                  <div className="text-center py-16">
+                    <div className="p-4 bg-purple-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                      <MessageSquare className="h-10 w-10 text-purple-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No messages found</h3>
+                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                      Click "Fetch Messages" to load your recent Slack messages and start extracting tasks
                     </p>
+                    <Button onClick={fetchMessages} disabled={isLoading} className="bg-purple-600 hover:bg-purple-700">
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                      Fetch Messages Now
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {messages.map((message) => (
                       <div
                         key={`${message.channel_id}-${message.ts}`}
-                        className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                        className="group border border-gray-200 rounded-xl p-6 hover: hover:border-gray-300 transition-all duration-300"
                       >
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-4">
                           <img
-                            src={message.user_info?.profile?.image_48 || '/default-avatar.png'}
+                            src={message.user_info?.profile?.image_48 || '/placeholder.svg?height=48&width=48&query=user+avatar'}
                             alt={message.user_info?.real_name || 'User'}
-                            className="w-10 h-10 rounded-full"
+                            className="w-12 h-12 rounded-full border-2 border-gray-200"
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="font-semibold text-gray-900">
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="font-semibold text-gray-900 text-lg">
                                 {message.user_info?.real_name || message.user_info?.name || 'Unknown User'}
                               </span>
                               <Badge 
                                 variant="secondary" 
-                                className={`text-xs ${getChannelBadgeColor(message.channel_type)}`}
+                                className={`${getChannelBadgeColor(message.channel_type)} border`}
                               >
                                 {getChannelIcon(message.channel_type)}
                                 <span className="ml-1">{message.channel_name}</span>
                               </Badge>
-                              <div className="flex items-center gap-1 text-xs text-gray-500">
-                                <Clock className="h-3 w-3" />
+                              <div className="flex items-center gap-1 text-sm text-gray-500">
+                                <Clock className="h-4 w-4" />
                                 {formatTimestamp(message.ts)}
                               </div>
                             </div>
-                            <p className="text-gray-700 whitespace-pre-wrap">
+                            <p className="text-gray-700 whitespace-pre-wrap leading-relaxed mb-3">
                               {message.text}
                             </p>
-                            {message.thread_ts && (
-                              <Badge variant="outline" className="mt-2 text-xs">
-                                Thread Reply
-                              </Badge>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {message.thread_ts && (
+                                <Badge variant="outline" className="text-xs border-blue-200 text-blue-700">
+                                  Thread Reply
+                                </Badge>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 ml-auto"
+                              >
+                                View in Slack
+                                <ArrowRight className="h-4 w-4 ml-1" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -478,9 +506,6 @@ function SlackPageContent() {
           </>
         )}
 
-        {/* Debug Info */}
-       
-
         {/* Multi-Step Loader */}
         <MultiStepLoader 
           loadingStates={slackLoadingStates} 
@@ -488,7 +513,6 @@ function SlackPageContent() {
           duration={1500}
           loop={false}
         />
-        
       </div>
 
       {/* Sync Dialog */}

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { RefreshCw, Calendar, Clock, Zap, Plus, ExternalLink, CheckCircle, AlertCircle } from "lucide-react";
+import { RefreshCw, Calendar, Clock, Zap, Plus, ExternalLink, CheckCircle, AlertCircle, CalendarDays, Timer, Target, Sparkles, ArrowRight, Users } from 'lucide-react';
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { LoaderOne } from "@/components/ui/loader";
 import { useSyncDialog } from "@/hooks/use-sync-dialog";
@@ -125,43 +125,6 @@ function CalendarPageContent() {
     }
   };
 
-  const testCalendarIntegration = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/calendar/test-create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        showSuccess(
-          'Calendar Integration Test Successful!',
-          `Created test event: "${data.eventTitle}" at ${new Date(data.startTime).toLocaleString()}.`,
-          `Event ID: ${data.eventId}. You can view it in Google Calendar!`
-        );
-      } else {
-        const errorData = await response.json();
-        showError(
-          'Calendar Integration Test Failed',
-          `Error: ${errorData.error}`,
-          errorData.suggestion || 'Please check your Google Calendar permissions and try again.'
-        );
-      }
-    } catch (error) {
-      console.error("Calendar test failed:", error);
-      showError(
-        'Calendar Test Error',
-        'Calendar integration test failed due to network error.',
-        'Please check your internet connection and try again.'
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const createCalendarEvent = async (suggestion: CalendarSuggestion) => {
     setCreatingEvents(prev => new Set([...prev, suggestion.taskId]));
     try {
@@ -187,7 +150,6 @@ function CalendarPageContent() {
           `Successfully created "${suggestion.title}" in your Google Calendar.`,
           `Event ID: ${data.eventId}. The event is now scheduled and you'll receive notifications.`
         );
-        // Remove this suggestion from the list
         setSuggestions(prev => prev.filter(s => s.taskId !== suggestion.taskId));
       } else {
         const errorData = await response.json();
@@ -234,167 +196,222 @@ function CalendarPageContent() {
 
   const getEventTypeBadgeColor = (eventType: string) => {
     switch (eventType) {
-      case 'meeting': return 'bg-blue-100 text-blue-800';
-      case 'call': return 'bg-green-100 text-green-800';
-      case 'presentation': return 'bg-purple-100 text-purple-800';
-      case 'appointment': return 'bg-orange-100 text-orange-800';
-      case 'work_session': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'meeting': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'call': return 'bg-green-100 text-green-800 border-green-200';
+      case 'presentation': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'appointment': return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'work_session': return 'bg-gray-100 text-gray-800 border-gray-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Google Calendar Integration</h1>
-            <p className="text-gray-600">Sync calendar events with tasks and create events from task suggestions</p>
+      <div className="space-y-8">
+        {/* Enhanced Header */}
+        <div className="relative overflow-hidden rounded-2xl bg-blue-600 p-8 text-white">
+         
+          <div className="relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
+                  <Calendar className="h-8 w-8" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold mb-2">Calendar Intelligence</h1>
+                  <p className="text-blue-100 text-lg">AI-powered scheduling and event optimization</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button 
+                  onClick={syncCalendarEvents} 
+                  disabled={isSyncing}
+                  className="bg-white/10 hover:bg-white/20 border-white/20 backdrop-blur-sm"
+                  variant="outline"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`} />
+                  {isSyncing ? "Syncing..." : "Sync Calendar"}
+                </Button>
+                <Button 
+                  onClick={analyzeTasks} 
+                  disabled={isAnalyzing}
+                  className="bg-white text-blue-600 hover:bg-gray-100"
+                >
+                  <Sparkles className={`h-4 w-4 mr-2 ${isAnalyzing ? "animate-spin" : ""}`} />
+                  {isAnalyzing ? "Analyzing..." : "AI Analysis"}
+                </Button>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              onClick={syncCalendarEvents} 
-              disabled={isSyncing}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isSyncing ? "animate-spin" : ""}`} />
-              {isSyncing ? "Syncing..." : "Sync Calendar"}
-            </Button>
-            <Button 
-              onClick={analyzeTasks} 
-              disabled={isAnalyzing}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Zap className={`h-4 w-4 ${isAnalyzing ? "animate-spin" : ""}`} />
-              {isAnalyzing ? "Analyzing..." : "Analyze Tasks"}
-            </Button>
-            
-          </div>
+         
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-blue-600" />
-                Events Processed
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
-                {stats.eventsProcessed}
+        {/* Enhanced Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="border-0  bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-blue-100 rounded-xl">
+                  <Calendar className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-blue-700">{stats.eventsProcessed}</div>
+                  <div className="text-blue-600 font-medium">Events Processed</div>
+                  <div className="text-blue-500 text-sm">Calendar events analyzed</div>
+                </div>
               </div>
-              <p className="text-sm text-gray-500">Calendar events analyzed</p>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                Tasks Created
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {stats.tasksCreated}
+          <Card className="border-0  bg-gradient-to-br from-green-50 to-emerald-50 hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-green-100 rounded-xl">
+                  <CheckCircle className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-green-700">{stats.tasksCreated}</div>
+                  <div className="text-green-600 font-medium">Tasks Created</div>
+                  <div className="text-green-500 text-sm">From calendar events</div>
+                </div>
               </div>
-              <p className="text-sm text-gray-500">From calendar events</p>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Zap className="h-5 w-5 text-orange-600" />
-                Event Suggestions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-orange-600">
-                {stats.suggestionsFound}
+          <Card className="border-0  bg-gradient-to-br from-orange-50 to-amber-50 hover:shadow-xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-orange-100 rounded-xl">
+                  <Zap className="h-6 w-6 text-orange-600" />
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-orange-700">{stats.suggestionsFound}</div>
+                  <div className="text-orange-600 font-medium">AI Suggestions</div>
+                  <div className="text-orange-500 text-sm">Smart event recommendations</div>
+                </div>
               </div>
-              <p className="text-sm text-gray-500">Tasks needing calendar events</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Calendar Event Suggestions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Calendar Event Suggestions</CardTitle>
-            <CardDescription>
-              AI-suggested calendar events for your tasks
-            </CardDescription>
+        {/* Enhanced Calendar Event Suggestions */}
+        <Card className="border-0 shadow-xl">
+          <CardHeader className="pb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Target className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Smart Event Suggestions</CardTitle>
+                  <CardDescription>AI-recommended calendar events for your tasks</CardDescription>
+                </div>
+              </div>
+              {suggestions.length > 0 && (
+                <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-3 py-1">
+                  {suggestions.length} suggestions
+                </Badge>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {suggestions.length === 0 ? (
-              <div className="text-center py-12">
-                <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2">No calendar event suggestions found</p>
-                <p className="text-sm text-gray-400">
-                  Click "Analyze Tasks" to find tasks that could benefit from calendar events
+              <div className="text-center py-16">
+                <div className="p-4 bg-purple-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                  <CalendarDays className="h-10 w-10 text-purple-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No suggestions found</h3>
+                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  Click "AI Analysis" to analyze your tasks and find opportunities for calendar events
                 </p>
+                <Button onClick={analyzeTasks} disabled={isAnalyzing} className="bg-purple-600 hover:bg-purple-700">
+                  <Sparkles className={`h-4 w-4 mr-2 ${isAnalyzing ? "animate-spin" : ""}`} />
+                  Analyze Tasks Now
+                </Button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {suggestions.map((suggestion) => (
                   <div
                     key={suggestion.taskId}
-                    className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                    className="group border border-gray-200 rounded-xl p-6 hover: hover:border-gray-300 transition-all duration-300"
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start justify-between gap-6">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg">{getEventTypeIcon(suggestion.eventType)}</span>
-                          <h3 className="font-semibold text-gray-900 truncate">
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="text-2xl">{getEventTypeIcon(suggestion.eventType)}</span>
+                          <h3 className="font-semibold text-gray-900 text-lg truncate">
                             {suggestion.title}
                           </h3>
                           <Badge 
                             variant="secondary" 
-                            className={`text-xs ${getEventTypeBadgeColor(suggestion.eventType)}`}
+                            className={`${getEventTypeBadgeColor(suggestion.eventType)} border`}
                           >
                             {suggestion.eventType.replace('_', ' ')}
                           </Badge>
                         </div>
                         
-                        <div className="text-sm text-gray-600 space-y-1 mb-3">
-                          <p><strong>Task:</strong> {suggestion.taskTitle}</p>
-                          <p><strong>Description:</strong> {suggestion.description}</p>
-                          <p className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            <strong>Suggested Time:</strong> {formatDateTime(suggestion.suggestedStartTime)}
-                          </p>
-                          <p><strong>Duration:</strong> {suggestion.suggestedDuration} minutes</p>
+                        <div className="space-y-3 mb-4">
+                          <div className="flex items-start gap-2">
+                            <Target className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-gray-700">Task:</span>
+                              <span className="text-gray-600 ml-2">{suggestion.taskTitle}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start gap-2">
+                            <Clock className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-gray-700">Suggested Time:</span>
+                              <span className="text-gray-600 ml-2">{formatDateTime(suggestion.suggestedStartTime)}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start gap-2">
+                            <Timer className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-gray-700">Duration:</span>
+                              <span className="text-gray-600 ml-2">{suggestion.suggestedDuration} minutes</span>
+                            </div>
+                          </div>
+                          
                           {suggestion.attendees.length > 0 && (
-                            <p><strong>Attendees:</strong> {suggestion.attendees.join(', ')}</p>
+                            <div className="flex items-start gap-2">
+                              <Users className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <span className="font-medium text-gray-700">Attendees:</span>
+                                <span className="text-gray-600 ml-2">{suggestion.attendees.join(', ')}</span>
+                              </div>
+                            </div>
                           )}
                         </div>
                         
-                        <div className="p-2 bg-blue-50 rounded-md">
-                          <p className="text-xs text-blue-800">
-                            <strong>AI Reasoning:</strong> {suggestion.reasoning}
-                          </p>
+                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="flex items-start gap-2">
+                            <Sparkles className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <span className="font-medium text-blue-800">AI Reasoning:</span>
+                              <p className="text-blue-700 mt-1">{suggestion.reasoning}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-3">
                         <Button
                           onClick={() => createCalendarEvent(suggestion)}
                           disabled={creatingEvents.has(suggestion.taskId)}
-                          size="sm"
-                          className="flex items-center gap-1"
+                          className="bg-green-600 hover:bg-green-700 text-white"
                         >
                           {creatingEvents.has(suggestion.taskId) ? (
                             <>
-                              <RefreshCw className="h-4 w-4 animate-spin" />
+                              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                               Creating...
                             </>
                           ) : (
                             <>
-                              <Plus className="h-4 w-4" />
+                              <Plus className="h-4 w-4 mr-2" />
                               Create Event
                             </>
                           )}
@@ -402,10 +419,9 @@ function CalendarPageContent() {
                         <Button
                           onClick={() => window.open('https://calendar.google.com', '_blank')}
                           variant="outline"
-                          size="sm"
-                          className="flex items-center gap-1"
+                          className="hover:bg-gray-50"
                         >
-                          <ExternalLink className="h-4 w-4" />
+                          <ExternalLink className="h-4 w-4 mr-2" />
                           Open Calendar
                         </Button>
                       </div>
@@ -417,7 +433,6 @@ function CalendarPageContent() {
           </CardContent>
         </Card>
 
-        {/* How It Works */}
         {/* Multi-Step Loader */}
         <MultiStepLoader 
           loadingStates={calendarLoadingStates} 
@@ -425,7 +440,6 @@ function CalendarPageContent() {
           duration={1500}
           loop={false}
         />
-        
       </div>
 
       {/* Sync Dialog */}

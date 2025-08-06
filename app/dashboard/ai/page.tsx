@@ -5,22 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { 
-  Brain, 
-  RefreshCw, 
-  Clock, 
-  AlertTriangle, 
-  CheckCircle, 
-  Target, 
-  Calendar,
-  TrendingUp,
-  Lightbulb,
-  Zap,
-  ArrowRight,
-  Timer,
-  Flag,
-  X
-} from "lucide-react";
+import { Brain, RefreshCw, Clock, AlertTriangle, CheckCircle, Target, Calendar, TrendingUp, Lightbulb, Zap, ArrowRight, Timer, Flag, X, Sparkles, BarChart3, Users, Activity } from 'lucide-react';
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { LoaderOne } from "@/components/ui/loader";
 
@@ -121,9 +106,6 @@ function AIPageContent() {
       if (response.ok) {
         const data: AIAnalysisResponse = await response.json();
         
-        console.log("AI Analysis Response:", data); // Debug log
-        
-        // Check if we have valid data
         if (data.success) {
           setAnalysis(data.analysis);
           setExecutionPlan(data.executionPlan);
@@ -134,23 +116,6 @@ function AIPageContent() {
           if (data.tasksAnalyzed === 0) {
             alert("🎉 Great! You have no pending tasks. All your tasks are completed!");
           } else {
-            console.log("Analysis data:", {
-              analysis: data.analysis,
-              executionPlan: data.executionPlan,
-              timetable: data.timetable,
-              priorityMatrix: data.priorityMatrix
-            });
-            
-            // Force a re-render by updating state in the next tick
-            setTimeout(() => {
-              console.log("State after update:", {
-                analysis,
-                executionPlan,
-                timetable,
-                priorityMatrix
-              });
-            }, 100);
-            
             alert(`✅ AI analysis complete!\n\nAnalyzed ${data.tasksAnalyzed} pending tasks and generated a comprehensive execution plan with prioritized timetable.`);
           }
         } else {
@@ -170,130 +135,12 @@ function AIPageContent() {
     }
   };
 
-  const testWithMockData = async () => {
-    setIsAnalyzing(true);
-    try {
-      const response = await fetch("/api/ai/test-analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data: AIAnalysisResponse = await response.json();
-        
-        console.log("Mock Analysis Response:", data); // Debug log
-        
-        setAnalysis(data.analysis);
-        setExecutionPlan(data.executionPlan);
-        setTimetable(data.timetable || []);
-        setPriorityMatrix(data.priorityMatrix);
-        setLastAnalysis(data.generatedAt);
-        
-        alert(`✅ Mock analysis complete!\n\nTesting with ${data.tasksAnalyzed} tasks. Check if the UI displays correctly.`);
-      } else {
-        const errorData = await response.json();
-        alert(`❌ Mock test failed: ${errorData.error}`);
-      }
-    } catch (error) {
-      console.error("Mock test failed:", error);
-      alert("❌ Mock test failed. Check console for details.");
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const setTestData = () => {
-    console.log("Setting test data directly...");
-    
-    setAnalysis({
-      totalTasks: 5,
-      criticalTasks: 2,
-      urgentTasks: 3,
-      blockedTasks: 1,
-      estimatedTotalTime: 300,
-      keyInsights: [
-        "You have a good balance of high and medium priority tasks",
-        "Most tasks have reasonable time estimates",
-        "Consider grouping similar tasks together"
-      ],
-      recommendations: [
-        "Start with critical tasks first",
-        "Block time for deep work",
-        "Set up calendar reminders"
-      ]
-    });
-
-    setExecutionPlan({
-      strategy: "Focus on high-priority tasks first, then batch similar work types together.",
-      phases: [
-        {
-          name: "Phase 1: Critical Tasks",
-          description: "Handle urgent and important tasks immediately",
-          duration: "2-3 hours",
-          taskIds: ["1", "2"],
-          reasoning: "These tasks have the highest impact"
-        }
-      ],
-      riskFactors: ["Task dependencies", "Time constraints"],
-      successMetrics: ["Complete critical tasks", "Make progress on remaining items"]
-    });
-
-    setTimetable([
-      {
-        timeSlot: "9:00 AM - 11:00 AM",
-        taskId: "1",
-        taskTitle: "Complete project proposal",
-        action: "Write and review project proposal document",
-        priority: "HIGH" as const,
-        reasoning: "High energy morning hours optimal for creative work",
-        preparationNeeded: "Gather requirements and templates",
-        expectedOutcome: "Complete draft of project proposal"
-      },
-      {
-        timeSlot: "11:00 AM - 12:00 PM",
-        taskId: "2",
-        taskTitle: "Review client feedback",
-        action: "Analyze and respond to client feedback",
-        priority: "MEDIUM" as const,
-        reasoning: "Good time for analytical work",
-        preparationNeeded: "Open client feedback document",
-        expectedOutcome: "Action plan for addressing feedback"
-      }
-    ]);
-
-    setPriorityMatrix({
-      doFirst: [
-        {
-          taskId: "1",
-          taskTitle: "Complete project proposal",
-          reasoning: "High priority with tight deadline"
-        }
-      ],
-      schedule: [
-        {
-          taskId: "2",
-          taskTitle: "Review client feedback",
-          reasoning: "Important but can be scheduled"
-        }
-      ],
-      delegate: [],
-      eliminate: []
-    });
-
-    setLastAnalysis(new Date().toISOString());
-    
-    console.log("Test data set successfully!");
-    alert("✅ Test data set! Check if the UI displays correctly now.");
-  };
-
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'HIGH': return 'bg-red-100 text-red-800';
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
-      case 'LOW': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'HIGH': return 'bg-red-100 text-red-800 border-red-200';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'LOW': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -308,85 +155,95 @@ function AIPageContent() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">AI Task Planner</h1>
-            <p className="text-gray-600">Intelligent execution plans and prioritization for your pending tasks</p>
+      <div className="space-y-8">
+        {/* Enhanced Header */}
+        <div className="relative overflow-hidden rounded-2xl bg-blue-600 p-8 text-white">
+        
+          <div className="relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
+                  <Brain className="h-8 w-8" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold mb-2">AI Task Planner</h1>
+                  <p className="text-indigo-100 text-lg">Intelligent execution plans and prioritization for your tasks</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button 
+                  onClick={analyzeTasksWithAI} 
+                  disabled={isAnalyzing}
+                  className="bg-white text-indigo-600 hover:bg-gray-100"
+                >
+                  <Brain className={`h-4 w-4 mr-2 ${isAnalyzing ? "animate-pulse" : ""}`} />
+                  {isAnalyzing ? "Analyzing..." : "Analyze Tasks"}
+                </Button>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              onClick={analyzeTasksWithAI} 
-              disabled={isAnalyzing}
-              className="flex items-center gap-2"
-            >
-              <Brain className={`h-4 w-4 ${isAnalyzing ? "animate-pulse" : ""}`} />
-              {isAnalyzing ? "Analyzing..." : "Analyze Tasks"}
-            </Button>
-            
           </div>
-        </div>
 
         {/* Analysis Overview */}
         {analysis && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Target className="h-5 w-5 text-blue-600" />
-                  Total Tasks
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">
-                  {analysis.totalTasks}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <Card className="border-0  bg-gradient-to-br from-blue-50 to-indigo-50 hover: transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-blue-100 rounded-xl">
+                    <Target className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-blue-700">{analysis.totalTasks}</div>
+                    <div className="text-blue-600 font-medium">Total Tasks</div>
+                    <div className="text-blue-500 text-sm">Pending tasks analyzed</div>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-500">Pending tasks analyzed</p>
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
-                  Critical Tasks
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">
-                  {analysis.criticalTasks}
+            <Card className="border-0  bg-gradient-to-br from-red-50 to-rose-50 hover: transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-red-100 rounded-xl">
+                    <AlertTriangle className="h-6 w-6 text-red-600" />
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-red-700">{analysis.criticalTasks}</div>
+                    <div className="text-red-600 font-medium">Critical Tasks</div>
+                    <div className="text-red-500 text-sm">High priority & urgent</div>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-500">High priority & urgent</p>
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-orange-600" />
-                  Urgent Tasks
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-orange-600">
-                  {analysis.urgentTasks}
+            <Card className="border-0  bg-gradient-to-br from-orange-50 to-amber-50 hover: transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-orange-100 rounded-xl">
+                    <Clock className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-orange-700">{analysis.urgentTasks}</div>
+                    <div className="text-orange-600 font-medium">Urgent Tasks</div>
+                    <div className="text-orange-500 text-sm">Time-sensitive items</div>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-500">Time-sensitive items</p>
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Timer className="h-5 w-5 text-purple-600" />
-                  Total Time
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-purple-600">
-                  {Math.round(analysis.estimatedTotalTime / 60)}h
+            <Card className="border-0  bg-gradient-to-br from-purple-50 to-violet-50 hover: transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-purple-100 rounded-xl">
+                    <Timer className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-purple-700">{Math.round(analysis.estimatedTotalTime / 60)}h</div>
+                    <div className="text-purple-600 font-medium">Total Time</div>
+                    <div className="text-purple-500 text-sm">Estimated duration</div>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-500">Estimated duration</p>
               </CardContent>
             </Card>
           </div>
@@ -395,44 +252,48 @@ function AIPageContent() {
         {/* AI Insights */}
         {analysis && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-yellow-600" />
-                  Key Insights
-                </CardTitle>
-                <CardDescription>
-                  AI-generated insights about your task portfolio
-                </CardDescription>
+            <Card className="border-0 ">
+              <CardHeader className="pb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-yellow-100 rounded-lg">
+                    <Lightbulb className="h-5 w-5 text-yellow-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">Key Insights</CardTitle>
+                    <CardDescription>AI-generated insights about your task portfolio</CardDescription>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {analysis.keyInsights.map((insight, index) => (
-                    <div key={index} className="flex items-start gap-2">
+                    <div key={index} className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                       <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <p className="text-sm text-gray-700">{insight}</p>
+                      <p className="text-sm text-gray-700 leading-relaxed">{insight}</p>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-green-600" />
-                  Recommendations
-                </CardTitle>
-                <CardDescription>
-                  AI suggestions for improved productivity
-                </CardDescription>
+            <Card className="border-0 ">
+              <CardHeader className="pb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">Recommendations</CardTitle>
+                    <CardDescription>AI suggestions for improved productivity</CardDescription>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {analysis.recommendations.map((recommendation, index) => (
-                    <div key={index} className="flex items-start gap-2">
+                    <div key={index} className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
                       <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <p className="text-sm text-gray-700">{recommendation}</p>
+                      <p className="text-sm text-gray-700 leading-relaxed">{recommendation}</p>
                     </div>
                   ))}
                 </div>
@@ -443,59 +304,75 @@ function AIPageContent() {
 
         {/* Execution Plan */}
         {executionPlan && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-blue-600" />
-                Execution Strategy
-              </CardTitle>
-              <CardDescription>
-                AI-generated execution plan for optimal task completion
-              </CardDescription>
+          <Card className="border-0 ">
+            <CardHeader className="pb-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Zap className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Execution Strategy</CardTitle>
+                  <CardDescription>AI-generated execution plan for optimal task completion</CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 mb-2">Overall Strategy</h4>
-                  <p className="text-blue-800">{executionPlan.strategy}</p>
+              <div className="space-y-8">
+                <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                  <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Overall Strategy
+                  </h4>
+                  <p className="text-blue-800 leading-relaxed">{executionPlan.strategy}</p>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-4">Execution Phases</h4>
+                  <h4 className="font-semibold mb-6 text-lg flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-gray-600" />
+                    Execution Phases
+                  </h4>
                   <div className="space-y-4">
                     {executionPlan.phases.map((phase, index) => (
-                      <div key={index} className="border rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                      <div key={index} className="border border-gray-200 rounded-xl p-6 hover: transition-all duration-300">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Badge variant="secondary" className="bg-purple-100 text-purple-800 border-purple-200 px-3 py-1">
                             {phase.name}
                           </Badge>
-                          <span className="text-sm text-gray-500">{phase.duration}</span>
+                          <span className="text-sm text-gray-500 font-medium">{phase.duration}</span>
                         </div>
-                        <p className="text-gray-700 mb-2">{phase.description}</p>
-                        <p className="text-sm text-gray-600 italic">{phase.reasoning}</p>
+                        <p className="text-gray-700 mb-3 leading-relaxed">{phase.description}</p>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-600 italic">{phase.reasoning}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-semibold text-red-700 mb-2">Risk Factors</h4>
-                    <ul className="space-y-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-6 bg-red-50 rounded-xl border border-red-200">
+                    <h4 className="font-semibold text-red-700 mb-4 flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5" />
+                      Risk Factors
+                    </h4>
+                    <ul className="space-y-2">
                       {executionPlan.riskFactors.map((risk, index) => (
                         <li key={index} className="text-sm text-red-600 flex items-start gap-2">
-                          <AlertTriangle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
                           {risk}
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-green-700 mb-2">Success Metrics</h4>
-                    <ul className="space-y-1">
+                  <div className="p-6 bg-green-50 rounded-xl border border-green-200">
+                    <h4 className="font-semibold text-green-700 mb-4 flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      Success Metrics
+                    </h4>
+                    <ul className="space-y-2">
                       {executionPlan.successMetrics.map((metric, index) => (
                         <li key={index} className="text-sm text-green-600 flex items-start gap-2">
-                          <CheckCircle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                           {metric}
                         </li>
                       ))}
@@ -509,86 +386,88 @@ function AIPageContent() {
 
         {/* Priority Matrix */}
         {priorityMatrix && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-purple-600" />
-                Eisenhower Priority Matrix
-              </CardTitle>
-              <CardDescription>
-                Tasks categorized by urgency and importance
-              </CardDescription>
+          <Card className="border-0 ">
+            <CardHeader className="pb-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Target className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Eisenhower Priority Matrix</CardTitle>
+                  <CardDescription>Tasks categorized by urgency and importance</CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border-2 border-red-200 rounded-lg p-4 bg-red-50">
-                  <h4 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
-                    <Flag className="h-4 w-4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="border-2 border-red-200 rounded-xl p-6 bg-gradient-to-br from-red-50 to-rose-50">
+                  <h4 className="font-semibold text-red-800 mb-4 flex items-center gap-2">
+                    <Flag className="h-5 w-5" />
                     Do First (Urgent & Important)
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {priorityMatrix.doFirst.map((task, index) => (
-                      <div key={index} className="bg-white p-2 rounded border">
-                        <p className="font-medium text-sm">{task.taskTitle}</p>
-                        <p className="text-xs text-gray-600">{task.reasoning}</p>
+                      <div key={index} className="bg-white p-4 rounded-lg border border-red-200 ">
+                        <p className="font-medium text-sm text-gray-900 mb-2">{task.taskTitle}</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">{task.reasoning}</p>
                       </div>
                     ))}
                     {priorityMatrix.doFirst.length === 0 && (
-                      <p className="text-sm text-gray-500 italic">No urgent & important tasks</p>
+                      <p className="text-sm text-gray-500 italic text-center py-4">No urgent & important tasks</p>
                     )}
                   </div>
                 </div>
 
-                <div className="border-2 border-blue-200 rounded-lg p-4 bg-blue-50">
-                  <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
+                <div className="border-2 border-blue-200 rounded-xl p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
+                  <h4 className="font-semibold text-blue-800 mb-4 flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
                     Schedule (Important, Not Urgent)
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {priorityMatrix.schedule.map((task, index) => (
-                      <div key={index} className="bg-white p-2 rounded border">
-                        <p className="font-medium text-sm">{task.taskTitle}</p>
-                        <p className="text-xs text-gray-600">{task.reasoning}</p>
+                      <div key={index} className="bg-white p-4 rounded-lg border border-blue-200 ">
+                        <p className="font-medium text-sm text-gray-900 mb-2">{task.taskTitle}</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">{task.reasoning}</p>
                       </div>
                     ))}
                     {priorityMatrix.schedule.length === 0 && (
-                      <p className="text-sm text-gray-500 italic">No tasks to schedule</p>
+                      <p className="text-sm text-gray-500 italic text-center py-4">No tasks to schedule</p>
                     )}
                   </div>
                 </div>
 
-                <div className="border-2 border-yellow-200 rounded-lg p-4 bg-yellow-50">
-                  <h4 className="font-semibold text-yellow-800 mb-3 flex items-center gap-2">
-                    <ArrowRight className="h-4 w-4" />
+                <div className="border-2 border-yellow-200 rounded-xl p-6 bg-gradient-to-br from-yellow-50 to-amber-50">
+                  <h4 className="font-semibold text-yellow-800 mb-4 flex items-center gap-2">
+                    <ArrowRight className="h-5 w-5" />
                     Delegate (Urgent, Not Important)
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {priorityMatrix.delegate.map((task, index) => (
-                      <div key={index} className="bg-white p-2 rounded border">
-                        <p className="font-medium text-sm">{task.taskTitle}</p>
-                        <p className="text-xs text-gray-600">{task.reasoning}</p>
+                      <div key={index} className="bg-white p-4 rounded-lg border border-yellow-200 ">
+                        <p className="font-medium text-sm text-gray-900 mb-2">{task.taskTitle}</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">{task.reasoning}</p>
                       </div>
                     ))}
                     {priorityMatrix.delegate.length === 0 && (
-                      <p className="text-sm text-gray-500 italic">No tasks to delegate</p>
+                      <p className="text-sm text-gray-500 italic text-center py-4">No tasks to delegate</p>
                     )}
                   </div>
                 </div>
 
-                <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
-                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    <X className="h-4 w-4" />
+                <div className="border-2 border-gray-200 rounded-xl p-6 bg-gradient-to-br from-gray-50 to-slate-50">
+                  <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <X className="h-5 w-5" />
                     Eliminate (Neither Urgent nor Important)
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {priorityMatrix.eliminate.map((task, index) => (
-                      <div key={index} className="bg-white p-2 rounded border">
-                        <p className="font-medium text-sm">{task.taskTitle}</p>
-                        <p className="text-xs text-gray-600">{task.reasoning}</p>
+                      <div key={index} className="bg-white p-4 rounded-lg border border-gray-200 ">
+                        <p className="font-medium text-sm text-gray-900 mb-2">{task.taskTitle}</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">{task.reasoning}</p>
                       </div>
                     ))}
                     {priorityMatrix.eliminate.length === 0 && (
-                      <p className="text-sm text-gray-500 italic">No tasks to eliminate</p>
+                      <p className="text-sm text-gray-500 italic text-center py-4">No tasks to eliminate</p>
                     )}
                   </div>
                 </div>
@@ -599,49 +478,54 @@ function AIPageContent() {
 
         {/* Structured Timetable */}
         {timetable.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-green-600" />
-                AI-Generated Timetable
-              </CardTitle>
-              <CardDescription>
-                Optimized schedule for maximum productivity
-              </CardDescription>
+          <Card className="border-0 ">
+            <CardHeader className="pb-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Calendar className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">AI-Generated Timetable</CardTitle>
+                  <CardDescription>Optimized schedule for maximum productivity</CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {timetable.map((entry, index) => (
-                  <div key={index} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-start justify-between gap-4">
+                  <div key={index} className="border border-gray-200 rounded-xl p-6 hover: transition-all duration-300">
+                    <div className="flex items-start justify-between gap-6">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200 px-3 py-1">
                             {entry.timeSlot}
                           </Badge>
                           <Badge 
                             variant="secondary" 
-                            className={`${getPriorityColor(entry.priority)} flex items-center gap-1`}
+                            className={`${getPriorityColor(entry.priority)} border flex items-center gap-1`}
                           >
                             {getPriorityIcon(entry.priority)}
                             {entry.priority}
                           </Badge>
                         </div>
                         
-                        <h4 className="font-semibold text-gray-900 mb-1">{entry.taskTitle}</h4>
-                        <p className="text-sm text-gray-700 mb-2">{entry.action}</p>
+                        <h4 className="font-semibold text-gray-900 text-lg mb-2">{entry.taskTitle}</h4>
+                        <p className="text-sm text-gray-700 mb-4 leading-relaxed">{entry.action}</p>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-600">
-                          <div>
-                            <strong>Why now:</strong> {entry.reasoning}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 mb-4">
+                          <div className="p-3 bg-blue-50 rounded-lg">
+                            <strong className="text-blue-800">Why now:</strong>
+                            <p className="text-blue-700 mt-1">{entry.reasoning}</p>
                           </div>
-                          <div>
-                            <strong>Preparation:</strong> {entry.preparationNeeded}
+                          <div className="p-3 bg-purple-50 rounded-lg">
+                            <strong className="text-purple-800">Preparation:</strong>
+                            <p className="text-purple-700 mt-1">{entry.preparationNeeded}</p>
                           </div>
                         </div>
                         
-                        <div className="mt-2 p-2 bg-green-50 rounded text-xs text-green-800">
-                          <strong>Expected outcome:</strong> {entry.expectedOutcome}
+                        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                          <strong className="text-green-800">Expected outcome:</strong>
+                          <p className="text-green-700 mt-1">{entry.expectedOutcome}</p>
                         </div>
                       </div>
                     </div>
@@ -654,51 +538,57 @@ function AIPageContent() {
 
         {/* Getting Started */}
         {!analysis && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-purple-600" />
-                AI Task Planning Assistant
-              </CardTitle>
-              <CardDescription>
-                Get intelligent execution plans for your pending tasks
-              </CardDescription>
+          <Card className="border-0 ">
+            <CardHeader className="pb-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Brain className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">AI Task Planning Assistant</CardTitle>
+                  <CardDescription>Get intelligent execution plans for your pending tasks</CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <Brain className="h-16 w-16 text-purple-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <div className="text-center py-16">
+                <div className="p-4 bg-purple-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                  <Brain className="h-10 w-10 text-purple-400" />
+                </div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                   Ready to optimize your productivity?
                 </h3>
-                <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                <p className="text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
                   Click "Analyze Tasks" to get AI-powered insights, execution plans, and structured timetables 
                   for all your pending tasks. The AI will analyze priorities, dependencies, and optimal scheduling.
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-                  <div className="text-center p-4">
-                    <Target className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                    <h4 className="font-medium mb-1">Smart Prioritization</h4>
-                    <p className="text-sm text-gray-600">AI analyzes urgency, importance, and dependencies</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
+                  <div className="text-center p-6 bg-blue-50 rounded-xl border border-blue-200">
+                    <Target className="h-10 w-10 text-blue-500 mx-auto mb-3" />
+                    <h4 className="font-semibold mb-2 text-blue-900">Smart Prioritization</h4>
+                    <p className="text-sm text-blue-700">AI analyzes urgency, importance, and dependencies</p>
                   </div>
-                  <div className="text-center p-4">
-                    <Calendar className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                    <h4 className="font-medium mb-1">Structured Timetable</h4>
-                    <p className="text-sm text-gray-600">Optimized schedule with time slots and actions</p>
+                  <div className="text-center p-6 bg-green-50 rounded-xl border border-green-200">
+                    <Calendar className="h-10 w-10 text-green-500 mx-auto mb-3" />
+                    <h4 className="font-semibold mb-2 text-green-900">Structured Timetable</h4>
+                    <p className="text-sm text-green-700">Optimized schedule with time slots and actions</p>
                   </div>
-                  <div className="text-center p-4">
-                    <Zap className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-                    <h4 className="font-medium mb-1">Execution Strategy</h4>
-                    <p className="text-sm text-gray-600">Phase-based approach with success metrics</p>
+                  <div className="text-center p-6 bg-purple-50 rounded-xl border border-purple-200">
+                    <Zap className="h-10 w-10 text-purple-500 mx-auto mb-3" />
+                    <h4 className="font-semibold mb-2 text-purple-900">Execution Strategy</h4>
+                    <p className="text-sm text-purple-700">Phase-based approach with success metrics</p>
                   </div>
                 </div>
+
+                <Button onClick={analyzeTasksWithAI} disabled={isAnalyzing} className="bg-blue-600 hover:bg-purple-700 text-white px-8 py-3">
+                  <Brain className={`h-5 w-5 mr-2 ${isAnalyzing ? "animate-pulse" : ""}`} />
+                  {isAnalyzing ? "Analyzing..." : "Start AI Analysis"}
+                </Button>
               </div>
             </CardContent>
           </Card>
         )}
-
-        {/* Debug Info - Remove this after fixing */}
-       
 
         {/* Last Analysis Info */}
         {lastAnalysis && (

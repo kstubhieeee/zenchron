@@ -459,7 +459,7 @@ function SettingsPageContent() {
                   className="flex items-center justify-between p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center">
+                    <div className="w-10 h-10 bg-white rounded-lg  flex items-center justify-center">
                       <img
                         src={permission.icon}
                         alt={permission.name}

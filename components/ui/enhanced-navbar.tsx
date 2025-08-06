@@ -109,13 +109,13 @@ export function EnhancedNavbar() {
                     className={cn(
                         "mx-auto max-w-7xl rounded-2xl transition-all duration-300 xl:px-0",
                         hasScrolled
-                            ? "px-2 border border-blue-200/50 backdrop-blur-lg bg-white/90 shadow-lg"
+                            ? "px-2 border border-blue-200/50 backdrop-blur-lg bg-white/90 "
                             : "px-4 bg-transparent border-0 shadow-none",
                     )}
                 >
                     <div className="flex h-[56px] items-center justify-between p-4">
                         <Link href="/" className="flex items-center gap-3 group">
-                            <div className="flex  items-center justify-center rounded-lg bg-white shadow-lg group-hover:shadow-xl transition-all duration-300">
+                            <div className="flex  items-center justify-center rounded-lg bg-white  group-hover:shadow-xl transition-all duration-300">
                                 <img 
                                     src="/zenn.png" 
                                     alt="Zenchron Logo" 
@@ -167,7 +167,7 @@ export function EnhancedNavbar() {
                         <div className="flex flex-row items-center gap-1 md:gap-3 shrink-0">
                             <div className="flex items-center space-x-6">
                                 <Link
-                                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-8 hidden md:flex items-center justify-center text-sm font-medium tracking-wide rounded-full text-white w-fit px-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
+                                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-8 hidden md:flex items-center justify-center text-sm font-medium tracking-wide rounded-full text-white w-fit px-6  hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
                                     href="/dashboard/tasks"
                                 >
                                     Try for free
@@ -213,7 +213,7 @@ export function EnhancedNavbar() {
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center justify-between">
                                     <Link href="/" className="flex items-center gap-3">
-                                        <div className="flex  items-center justify-center rounded-lg bg-white shadow-lg">
+                                        <div className="flex  items-center justify-center rounded-lg bg-white ">
                                             <img 
                                                 src="/zenn.png" 
                                                 alt="Zenchron Logo" 
@@ -274,7 +274,7 @@ export function EnhancedNavbar() {
                                 <div className="flex flex-col gap-2">
                                     <Link
                                         href="/dashboard/tasks"
-                                        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-10 flex items-center justify-center text-sm font-medium tracking-wide rounded-lg text-white w-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
+                                        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-10 flex items-center justify-center text-sm font-medium tracking-wide rounded-lg text-white w-full  hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
                                     >
                                         Try for free
                                     </Link>

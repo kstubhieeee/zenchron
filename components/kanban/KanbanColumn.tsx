@@ -30,7 +30,7 @@ export function KanbanColumn({ title, color, children }: KanbanColumnProps) {
   
   return (
     <div 
-      className="flex flex-col h-full rounded-lg shadow-sm overflow-hidden"
+      className="flex flex-col h-full rounded-lg  overflow-hidden"
       style={{ border: `1px solid ${styles.borderColor}` }}
     >
       <div 

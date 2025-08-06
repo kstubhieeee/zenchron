@@ -238,7 +238,7 @@ function CalendarDemo({ className }: { className?: string }) {
             isReadOnly
             aria-label="Smart Scheduling Calendar"
             value={today(getLocalTimeZone())}
-            className={cn("rounded-md shadow-sm", className)}
+            className={cn("rounded-md ", className)}
         />
     );
 }
