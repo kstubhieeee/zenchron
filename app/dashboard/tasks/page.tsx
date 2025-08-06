@@ -7,10 +7,57 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { CheckSquare, Clock, Target, TrendingUp, Plus, Filter, Calendar, Zap, BarChart3, Users, Timer } from 'lucide-react';
+import { CheckSquare, Clock, Target, Plus, Filter, Calendar, Zap, BarChart3, Users, Timer } from 'lucide-react';
+
+// Example Button Component
+interface ExampleButtonProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  example: string;
+  gradient: string;
+}
+
+function ExampleButton({ icon, title, description, example, gradient, onExampleClick }: ExampleButtonProps & { onExampleClick: (example: string) => void }) {
+  const handleClick = () => {
+    onExampleClick(example);
+    // Scroll to the textarea
+    setTimeout(() => {
+      const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.focus();
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
+
+  return (
+    <Button
+      variant="outline"
+      className="h-auto p-4 flex flex-col items-start space-y-2 hover:shadow-lg transition-all duration-200 border-2 hover:border-transparent group"
+      onClick={handleClick}
+    >
+      <div className={`w-full flex items-center justify-between mb-2`}>
+        <div className={`p-2 rounded-lg bg-gradient-to-r ${gradient} text-white group-hover:scale-110 transition-transform duration-200`}>
+          {icon}
+        </div>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+            Click to use
+          </div>
+        </div>
+      </div>
+      <div className="text-left w-full">
+        <h5 className="font-semibold text-gray-900 text-sm mb-1">{title}</h5>
+        <p className="text-xs text-gray-600 leading-relaxed">{description}</p>
+      </div>
+    </Button>
+  );
+}
 
 export default function TasksPage() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [taskInput, setTaskInput] = useState('');
   const [quickStats, setQuickStats] = useState({
     total: 0,
     completed: 0,
@@ -22,52 +69,12 @@ export default function TasksPage() {
     setRefreshKey(prev => prev + 1);
   };
 
-  useEffect(() => {
-    // Fetch quick stats
-    fetchQuickStats();
-  }, [refreshKey]);
-
-  const fetchQuickStats = async () => {
-    try {
-      const response = await fetch('/api/tasks/stats');
-      if (response.ok) {
-        const data = await response.json();
-        setQuickStats(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
-    }
-  };
+ 
 
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        {/* Enhanced Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-blue-600 p-8 text-white">
-          
-          <div className="relative z-10">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold mb-2">Smart Task Manager</h1>
-                <p className="text-blue-100 text-lg">AI-powered task organization with voice input and smart categorization</p>
-              </div>
-              <div className="hidden md:flex items-center space-x-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold">{quickStats.total}</div>
-                  <div className="text-blue-200 text-sm">Total Tasks</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-300">{quickStats.completed}</div>
-                  <div className="text-blue-200 text-sm">Completed</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-yellow-300">{quickStats.inProgress}</div>
-                  <div className="text-blue-200 text-sm">In Progress</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Quick Stats Cards - Mobile */}
         <div className="grid grid-cols-2 md:hidden gap-4">
@@ -100,7 +107,7 @@ export default function TasksPage() {
         </div>
 
         {/* Enhanced Task Input */}
-        <Card className="border-0  bg-gradient-to-r from-white to-gray-50">
+        <Card className="border-0 bg-gradient-to-r from-white to-gray-50">
           <CardHeader className="pb-4">
             <div className="flex items-center space-x-2">
               <div className="p-2 bg-purple-100 rounded-lg">
@@ -108,38 +115,25 @@ export default function TasksPage() {
               </div>
               <div>
                 <CardTitle className="text-xl">Create New Tasks</CardTitle>
-                <CardDescription>Use voice input or type to create AI-categorized tasks</CardDescription>
+                <CardDescription>Use voice input, type manually, or try our quick examples</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <TaskInput onTasksCreated={handleTasksCreated} />
+          <CardContent className="space-y-6">
+            <TaskInput 
+              onTasksCreated={handleTasksCreated} 
+              externalInput={taskInput}
+              onInputChange={setTaskInput}
+            />
+            
+            {/* Quick Example Buttons */}
+            
           </CardContent>
         </Card>
 
         {/* Enhanced Kanban Board */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <BarChart3 className="h-5 w-5 text-indigo-600" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Task Board</h2>
-                <p className="text-gray-600">Organize and track your tasks by category and status</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                <Filter className="h-4 w-4" />
-                <span>Filter</span>
-              </Button>
-              <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4" />
-                <span>Calendar View</span>
-              </Button>
-            </div>
-          </div>
+        
           
           <KanbanBoard refreshTrigger={refreshKey} />
         </div>

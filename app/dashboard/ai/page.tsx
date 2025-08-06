@@ -105,14 +105,14 @@ function AIPageContent() {
 
       if (response.ok) {
         const data: AIAnalysisResponse = await response.json();
-        
+
         if (data.success) {
           setAnalysis(data.analysis);
           setExecutionPlan(data.executionPlan);
           setTimetable(data.timetable || []);
           setPriorityMatrix(data.priorityMatrix);
           setLastAnalysis(data.generatedAt);
-          
+
           if (data.tasksAnalyzed === 0) {
             alert("🎉 Great! You have no pending tasks. All your tasks are completed!");
           } else {
@@ -158,7 +158,7 @@ function AIPageContent() {
       <div className="space-y-8">
         {/* Enhanced Header */}
         <div className="relative overflow-hidden rounded-2xl bg-blue-600 p-8 text-white">
-        
+
           <div className="relative z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -171,8 +171,8 @@ function AIPageContent() {
                 </div>
               </div>
               <div className="flex gap-3">
-                <Button 
-                  onClick={analyzeTasksWithAI} 
+                <Button
+                  onClick={analyzeTasksWithAI}
                   disabled={isAnalyzing}
                   className="bg-white text-indigo-600 hover:bg-gray-100"
                 >
@@ -182,7 +182,7 @@ function AIPageContent() {
               </div>
             </div>
           </div>
-          </div>
+        </div>
 
         {/* Analysis Overview */}
         {analysis && (
@@ -201,7 +201,7 @@ function AIPageContent() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card className="border-0  bg-gradient-to-br from-red-50 to-rose-50 hover: transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
@@ -216,7 +216,7 @@ function AIPageContent() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card className="border-0  bg-gradient-to-br from-orange-50 to-amber-50 hover: transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
@@ -231,7 +231,7 @@ function AIPageContent() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card className="border-0  bg-gradient-to-br from-purple-50 to-violet-50 hover: transition-all duration-300">
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
@@ -500,18 +500,18 @@ function AIPageContent() {
                           <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200 px-3 py-1">
                             {entry.timeSlot}
                           </Badge>
-                          <Badge 
-                            variant="secondary" 
+                          <Badge
+                            variant="secondary"
                             className={`${getPriorityColor(entry.priority)} border flex items-center gap-1`}
                           >
                             {getPriorityIcon(entry.priority)}
                             {entry.priority}
                           </Badge>
                         </div>
-                        
+
                         <h4 className="font-semibold text-gray-900 text-lg mb-2">{entry.taskTitle}</h4>
                         <p className="text-sm text-gray-700 mb-4 leading-relaxed">{entry.action}</p>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 mb-4">
                           <div className="p-3 bg-blue-50 rounded-lg">
                             <strong className="text-blue-800">Why now:</strong>
@@ -522,7 +522,7 @@ function AIPageContent() {
                             <p className="text-purple-700 mt-1">{entry.preparationNeeded}</p>
                           </div>
                         </div>
-                        
+
                         <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                           <strong className="text-green-800">Expected outcome:</strong>
                           <p className="text-green-700 mt-1">{entry.expectedOutcome}</p>
@@ -559,10 +559,10 @@ function AIPageContent() {
                   Ready to optimize your productivity?
                 </h3>
                 <p className="text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-                  Click "Analyze Tasks" to get AI-powered insights, execution plans, and structured timetables 
+                  Click "Analyze Tasks" to get AI-powered insights, execution plans, and structured timetables
                   for all your pending tasks. The AI will analyze priorities, dependencies, and optimal scheduling.
                 </p>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
                   <div className="text-center p-6 bg-blue-50 rounded-xl border border-blue-200">
                     <Target className="h-10 w-10 text-blue-500 mx-auto mb-3" />
@@ -598,9 +598,9 @@ function AIPageContent() {
         )}
 
         {/* Multi-Step Loader */}
-        <MultiStepLoader 
-          loadingStates={aiLoadingStates} 
-          loading={isAnalyzing} 
+        <MultiStepLoader
+          loadingStates={aiLoadingStates}
+          loading={isAnalyzing}
           duration={1500}
           loop={false}
         />

@@ -16,14 +16,23 @@ import {
 
 interface TaskInputProps {
   onTasksCreated: (tasks: any[]) => void;
+  externalInput?: string;
+  onInputChange?: (value: string) => void;
 }
 
-export function TaskInput({ onTasksCreated }: TaskInputProps) {
-  const [input, setInput] = useState('');
+export function TaskInput({ onTasksCreated, externalInput, onInputChange }: TaskInputProps) {
+  const [input, setInput] = useState(externalInput || '');
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  // Update input when externalInput changes
+  useEffect(() => {
+    if (externalInput !== undefined) {
+      setInput(externalInput);
+    }
+  }, [externalInput]);
 
   useEffect(() => {
     // Check if speech recognition is supported
@@ -173,15 +182,15 @@ export function TaskInput({ onTasksCreated }: TaskInputProps) {
     <Card className="mb-6">
       <CardContent className="p-4">
         <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-5 w-5 text-purple-600" />
-            <h3 className="font-semibold text-gray-900">Add Tasks with AI</h3>
-          </div>
+          
           
           <div className="relative">
             <Textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                onInputChange?.(e.target.value);
+              }}
               onKeyDown={handleKeyPress}
               placeholder="Describe your tasks... (e.g., 'Call John about the project tomorrow, review quarterly reports by Friday, quick email to Sarah')"
               className="min-h-[100px] pr-12 resize-none"
@@ -231,12 +240,7 @@ export function TaskInput({ onTasksCreated }: TaskInputProps) {
             </Button>
           </div>
 
-          <div className="text-xs text-gray-400 space-y-1">
-            <p>💡 <strong>Examples:</strong></p>
-            <p>• "Call John about the project tomorrow at 2 PM"</p>
-            <p>• "Review quarterly reports by Friday, send follow-up email to Sarah"</p>
-            <p>• "Prepare presentation for Monday meeting, book conference room"</p>
-          </div>
+         
         </div>
       </CardContent>
     </Card>
