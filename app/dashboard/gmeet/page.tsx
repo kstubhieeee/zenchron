@@ -7,7 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { Download, Video, FileText, Zap, Copy, CheckCircle, AlertCircle, ExternalLink, Settings, Webhook, User } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { LoaderOne } from "@/components/ui/loader";
 import { useSession } from "next-auth/react";
+import { useSyncDialog } from "@/hooks/use-sync-dialog";
+import { SyncDialog } from "@/components/ui/sync-dialog";
 
 interface MeetingRecord {
   _id: string;
@@ -27,6 +30,7 @@ function GMeetPageContent() {
   const [webhookUrl, setWebhookUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
+  const { dialogState, showSuccess, showError, closeDialog } = useSyncDialog();
 
   const gmeetLoadingStates = [
     { text: "Connecting to Google Meet..." },
@@ -102,16 +106,28 @@ function GMeetPageContent() {
 
       if (response.ok) {
         const data = await response.json();
-        alert(`Test webhook successful! Created ${data.webhookResponse.tasksExtracted || 0} tasks.`);
+        showSuccess(
+          'Webhook Test Successful!',
+          `Test webhook completed successfully and created ${data.webhookResponse.tasksExtracted || 0} tasks.`,
+          'The TranscripTonic integration is working correctly. You can now use it in Google Meet.'
+        );
         // Refresh meetings to show the test meeting
         loadMeetings();
       } else {
         const errorData = await response.json();
-        alert(`Test webhook failed: ${errorData.error}`);
+        showError(
+          'Webhook Test Failed',
+          `Test webhook failed: ${errorData.error}`,
+          'Please check your webhook configuration and try again.'
+        );
       }
     } catch (error) {
       console.error("Test webhook failed:", error);
-      alert("Test webhook failed. Check console for details.");
+      showError(
+        'Webhook Test Error',
+        'Test webhook failed due to network error.',
+        'Please check your connection and try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -277,6 +293,16 @@ function GMeetPageContent() {
         />
         
       </div>
+
+      {/* Sync Dialog */}
+      <SyncDialog
+        isOpen={dialogState.isOpen}
+        onClose={closeDialog}
+        success={dialogState.success}
+        title={dialogState.title}
+        message={dialogState.message}
+        details={dialogState.details}
+      />
     </DashboardLayout>
   );
 }
@@ -291,13 +317,8 @@ export default function GMeetPage() {
   if (!mounted) {
     return (
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Google Meet Integration</h1>
-              <p className="text-gray-600">Loading...</p>
-            </div>
-          </div>
+        <div className="min-h-screen flex items-center justify-center">
+          <LoaderOne />
         </div>
       </DashboardLayout>
     );

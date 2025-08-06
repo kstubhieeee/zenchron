@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { RefreshCw, MessageSquare, Users, Hash, User, Clock, Zap } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { LoaderOne } from "@/components/ui/loader";
+import { useSyncDialog } from "@/hooks/use-sync-dialog";
+import { SyncDialog } from "@/components/ui/sync-dialog";
 
 interface SlackMessage {
   ts: string;
@@ -47,6 +50,7 @@ function SlackPageContent() {
   const [stats, setStats] = useState({ total: 0, mentions: 0, dms: 0, tasksExtracted: 0 });
   const [debugInfo, setDebugInfo] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
+  const { dialogState, showSuccess, showError, closeDialog } = useSyncDialog();
   const [extractingTasks, setExtractingTasks] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
 
@@ -166,15 +170,27 @@ function SlackPageContent() {
       setLastSync(new Date());
       
       if (data.tasksExtracted > 0) {
-        alert(`Successfully extracted ${data.tasksExtracted} tasks from ${data.messagesProcessed} Slack messages!`);
+        showSuccess(
+          'Tasks Extracted Successfully!',
+          `Successfully extracted ${data.tasksExtracted} tasks from ${data.messagesProcessed} Slack messages.`,
+          'Check the Tasks page to see your new action items from Slack conversations.'
+        );
       } else {
-        alert(`No new tasks found. Processed ${data.messagesProcessed} messages.`);
+        showSuccess(
+          'Slack Sync Complete',
+          `No new tasks found. Processed ${data.messagesProcessed} messages.`,
+          'All your Slack messages have been analyzed. Try again later for new content.'
+        );
       }
       
       console.log("Task extraction results:", data);
     } catch (error) {
       console.error("Failed to extract tasks:", error);
-      alert(`Failed to extract tasks: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      showError(
+        'Task Extraction Failed',
+        `Failed to extract tasks: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'Please check your Slack connection and try again.'
+      );
     } finally {
       setExtractingTasks(false);
     }
@@ -474,6 +490,16 @@ function SlackPageContent() {
         />
         
       </div>
+
+      {/* Sync Dialog */}
+      <SyncDialog
+        isOpen={dialogState.isOpen}
+        onClose={closeDialog}
+        success={dialogState.success}
+        title={dialogState.title}
+        message={dialogState.message}
+        details={dialogState.details}
+      />
     </DashboardLayout>
   );
 }
@@ -488,13 +514,8 @@ export default function SlackPage() {
   if (!mounted) {
     return (
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Slack Integration</h1>
-              <p className="text-gray-600">Loading...</p>
-            </div>
-          </div>
+        <div className="min-h-screen flex items-center justify-center">
+          <LoaderOne />
         </div>
       </DashboardLayout>
     );

@@ -22,6 +22,7 @@ import {
   X
 } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { LoaderOne } from "@/components/ui/loader";
 
 interface TaskAnalysis {
   totalTasks: number;
@@ -728,13 +729,8 @@ export default function AIPage() {
   if (!mounted) {
     return (
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">AI Task Planner</h1>
-              <p className="text-gray-600">Loading...</p>
-            </div>
-          </div>
+        <div className="min-h-screen flex items-center justify-center">
+          <LoaderOne />
         </div>
       </DashboardLayout>
     );

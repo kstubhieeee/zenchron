@@ -17,8 +17,20 @@ export default function PrivacyPolicyPage() {
                             Back to Home
                         </Button>
                     </Link>
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-                    <p className="text-gray-600">Last updated: February 8, 2025</p>
+                    {/* Zenchron Logo */}
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-lg">
+                            <img 
+                                src="/zenn.png" 
+                                alt="Zenchron Logo" 
+                                className="h-8 w-8 object-contain"
+                            />
+                        </div>
+                        <div>
+                            <h1 className="text-4xl font-bold text-gray-900">Privacy Policy</h1>
+                            <p className="text-gray-600">Last updated: February 8, 2025</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="space-y-6">

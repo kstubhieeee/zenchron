@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Smart Auto-Prioritizer",
+  title: "Zenchron - AI Task Manager",
   description: "AI-powered task management with Gmail and Calendar integration",
 };
 

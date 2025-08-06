@@ -19,6 +19,7 @@ import {
   GMeetIcon,
 } from "@/components/icons/glass-icons";
 import { MenuIcon, ChevronLeftIcon } from "@/components/icons/menu-icons";
+import { LoaderOne } from "@/components/ui/loader";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -45,8 +46,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <LoaderOne />
+          <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -74,12 +75,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         {/* Header */}
         <div className={`p-4 border-b ${isCollapsed ? 'flex justify-center' : ''}`}>
           <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl">
-              <RobotIcon size={22} className="text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-lg">
+              <img 
+                src="/zenn.png" 
+                alt="Zenchron Logo" 
+                className="h-7 w-7 object-contain"
+              />
             </div>
             {!isCollapsed && (
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-gray-900">Smart Auto-Prioritizer</span>
+                <span className="text-sm font-semibold text-gray-900">Zenchron</span>
                 <span className="text-xs text-gray-500">AI Task Manager</span>
               </div>
             )}
@@ -179,7 +184,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <ChevronLeftIcon size={18} className="text-gray-600" />
               )}
             </Button>
-            <h1 className="text-lg font-semibold text-gray-900">Smart Auto-Prioritizer</h1>
+            <h1 className="text-lg font-semibold text-gray-900">Zenchron</h1>
           </div>
         </header>
 

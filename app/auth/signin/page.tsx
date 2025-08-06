@@ -45,9 +45,19 @@ export default function SignIn() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
-          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+          {/* Zenchron Logo */}
+          <div className="flex justify-center mb-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
+              <img 
+                src="/zenn.png" 
+                alt="Zenchron Logo" 
+                className="h-12 w-12 object-contain"
+              />
+            </div>
+          </div>
+          <CardTitle className="text-2xl font-bold">Welcome to Zenchron</CardTitle>
           <CardDescription>
-            Sign in with your Google account to access Smart Auto-Prioritizer
+            Sign in with your Google account to access your AI task manager
           </CardDescription>
         </CardHeader>
         

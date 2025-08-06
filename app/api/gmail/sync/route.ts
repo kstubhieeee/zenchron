@@ -135,7 +135,7 @@ export async function POST() {
 
         const newEmailsData = await Promise.all(newEmailPromises);
         const processedEmailsData = await Promise.all(processedEmailPromises);
-        
+
         console.log("New emails to process:", newEmailsData.length);
         console.log("Already processed emails:", processedEmailsData.length);
 
@@ -151,7 +151,7 @@ export async function POST() {
                     source: 'gmail',
                     'metadata.emailId': email.id
                 }).toArray();
-                
+
                 email.extractedTasks = tasks.map(task => ({
                     title: task.title,
                     description: task.description,
@@ -284,7 +284,7 @@ If not work-related, set isWorkRelated to false and empty tasks array.`;
         const aiProcessedEmails = await Promise.all(processEmailPromises);
 
         // Filter work-related emails with tasks
-        const workEmailsWithTasks = aiProcessedEmails.filter(email => 
+        const workEmailsWithTasks = aiProcessedEmails.filter(email =>
             email.isWorkRelated && email.hasTasks && email.extractedTasks.length > 0
         );
 
@@ -341,7 +341,7 @@ If not work-related, set isWorkRelated to false and empty tasks array.`;
         await Promise.all(labelPromises);
 
         // Filter processed emails that have tasks
-        const processedWorkEmails = processedEmailsData.filter(email => 
+        const processedWorkEmails = processedEmailsData.filter(email =>
             email.extractedTasks && email.extractedTasks.length > 0
         );
 

@@ -115,8 +115,12 @@ export function EnhancedNavbar() {
                 >
                     <div className="flex h-[56px] items-center justify-between p-4">
                         <Link href="/" className="flex items-center gap-3 group">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg group-hover:shadow-xl transition-all duration-300">
-                                <Zap className="h-4 w-4 text-white" />
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-lg group-hover:shadow-xl transition-all duration-300">
+                                <img 
+                                    src="/zenn.png" 
+                                    alt="Zenchron Logo" 
+                                    className="h-6 w-6 object-contain"
+                                />
                             </div>
                             <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                                 Zenchron
@@ -209,8 +213,12 @@ export function EnhancedNavbar() {
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center justify-between">
                                     <Link href="/" className="flex items-center gap-3">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
-                                            <Zap className="h-4 w-4 text-white" />
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-lg">
+                                            <img 
+                                                src="/zenn.png" 
+                                                alt="Zenchron Logo" 
+                                                className="h-6 w-6 object-contain"
+                                            />
                                         </div>
                                         <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                                             Zenchron

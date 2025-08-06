@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { RefreshCw, FileText, Database, Clock, Link as LinkIcon, CheckCircle, AlertCircle, Eye, X, ChevronRight, ChevronDown, Zap, CheckSquare } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { LoaderOne } from "@/components/ui/loader";
+import { useSyncDialog } from "@/hooks/use-sync-dialog";
+import { SyncDialog } from "@/components/ui/sync-dialog";
 
 interface NotionPage {
   id: string;
@@ -76,6 +79,7 @@ function NotionPageContent() {
   const [showContentModal, setShowContentModal] = useState(false);
   const [extractingTasks, setExtractingTasks] = useState<string | null>(null);
   const [processedPages, setProcessedPages] = useState<Set<string>>(new Set());
+  const { dialogState, showSuccess, showError, closeDialog } = useSyncDialog();
 
   const notionLoadingStates = [
     { text: "Connecting to Notion workspace..." },
@@ -141,7 +145,11 @@ function NotionPageContent() {
 
   const fetchPages = async () => {
     if (!isConnected) {
-      alert("Please connect to Notion first");
+      showError(
+        'Connection Required',
+        'Please connect to Notion first before fetching pages.',
+        'Click the "Connect to Notion" button to authenticate your workspace.'
+      );
       return;
     }
 
@@ -180,10 +188,20 @@ function NotionPageContent() {
         pages: regularPages
       });
 
+      showSuccess(
+        'Notion Pages Fetched!',
+        `Successfully loaded ${data.totalFetched} items from your Notion workspace.`,
+        `Found ${databases} databases and ${regularPages} pages ready for task extraction.`
+      );
+
       console.log("Debug info:", data.debug);
     } catch (error) {
       console.error("Failed to fetch pages:", error);
-      alert("Failed to fetch Notion pages. Please try again.");
+      showError(
+        'Fetch Failed',
+        'Failed to fetch Notion pages.',
+        'Please check your connection and try again. If the problem persists, try reconnecting to Notion.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -233,15 +251,27 @@ function NotionPageContent() {
       const data = await response.json();
       
       if (data.alreadyProcessed) {
-        alert(`This page was already processed on ${new Date(data.processedAt).toLocaleDateString()}. Found ${data.tasksCount} existing tasks.`);
+        showSuccess(
+          'Page Already Processed',
+          `This page was already processed on ${new Date(data.processedAt).toLocaleDateString()}.`,
+          `Found ${data.tasksCount} existing tasks from "${data.pageTitle}". No new tasks were created.`
+        );
       } else {
-        alert(`Successfully extracted ${data.tasksExtracted} tasks from "${data.pageTitle}"!`);
+        showSuccess(
+          'Tasks Extracted Successfully!',
+          `Successfully extracted ${data.tasksExtracted} tasks from "${data.pageTitle}".`,
+          'Check the Tasks page to see your new action items from this Notion page.'
+        );
         // Mark this page as processed
         setProcessedPages(prev => new Set([...prev, page.id]));
       }
     } catch (error) {
       console.error("Failed to extract tasks:", error);
-      alert(`Failed to extract tasks: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      showError(
+        'Task Extraction Failed',
+        `Failed to extract tasks: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'Please check your Notion connection and try again.'
+      );
     } finally {
       setExtractingTasks(null);
     }
@@ -286,7 +316,11 @@ function NotionPageContent() {
       setPageContent(data);
     } catch (error) {
       console.error("Failed to fetch page content:", error);
-      alert("Failed to fetch page content. Please try again.");
+      showError(
+        'Content Load Failed',
+        'Failed to fetch page content.',
+        'Please check your connection and try again.'
+      );
     } finally {
       setIsLoadingContent(false);
     }
@@ -753,6 +787,16 @@ function NotionPageContent() {
           loop={false}
         />
       </div>
+
+      {/* Sync Dialog */}
+      <SyncDialog
+        isOpen={dialogState.isOpen}
+        onClose={closeDialog}
+        success={dialogState.success}
+        title={dialogState.title}
+        message={dialogState.message}
+        details={dialogState.details}
+      />
     </DashboardLayout>
   );
 }
@@ -767,13 +811,8 @@ export default function NotionPage() {
   if (!mounted) {
     return (
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Notion Integration</h1>
-              <p className="text-gray-600">Loading...</p>
-            </div>
-          </div>
+        <div className="min-h-screen flex items-center justify-center">
+          <LoaderOne />
         </div>
       </DashboardLayout>
     );

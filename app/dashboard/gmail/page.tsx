@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { RefreshCw, Mail, Clock, User } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { LoaderOne } from "@/components/ui/loader";
+import { useSyncDialog } from "@/hooks/use-sync-dialog";
+import { SyncDialog } from "@/components/ui/sync-dialog";
 
 
 
@@ -37,6 +40,7 @@ export default function GmailPage() {
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [stats, setStats] = useState({ total: 0, work: 0, tasks: 0, processed: 0 });
   const [activeTab, setActiveTab] = useState<'new' | 'processed'>('new');
+  const { dialogState, showSuccess, showError, closeDialog } = useSyncDialog();
 
   const gmailLoadingStates = [
     { text: "Connecting to Gmail account..." },
@@ -75,10 +79,23 @@ export default function GmailPage() {
         processed: data.processedEmailsCount
       });
       setLastSync(new Date());
+
+      // Show success dialog with confetti
+      showSuccess(
+        'Gmail Sync Complete!',
+        `Successfully synced ${data.totalFetched} emails and found ${data.workEmailsCount} work-related emails.`,
+        `Created ${data.tasksCreated} new tasks from your emails. Check the Tasks page to see them.`
+      );
     } catch (error) {
       console.error("Sync failed:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      alert(`Failed to sync emails: ${errorMessage}`);
+      
+      // Show error dialog without confetti
+      showError(
+        'Gmail Sync Failed',
+        `Failed to sync emails: ${errorMessage}`,
+        'Please check your Gmail connection and try again. If the problem persists, contact support.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -277,6 +294,16 @@ export default function GmailPage() {
         />
         
       </div>
+
+      {/* Sync Dialog */}
+      <SyncDialog
+        isOpen={dialogState.isOpen}
+        onClose={closeDialog}
+        success={dialogState.success}
+        title={dialogState.title}
+        message={dialogState.message}
+        details={dialogState.details}
+      />
     </DashboardLayout>
   );
 }

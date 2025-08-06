@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { RefreshCw, Calendar, Clock, Zap, Plus, ExternalLink, CheckCircle, AlertCircle } from "lucide-react";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { LoaderOne } from "@/components/ui/loader";
+import { useSyncDialog } from "@/hooks/use-sync-dialog";
+import { SyncDialog } from "@/components/ui/sync-dialog";
 
 interface CalendarSuggestion {
   taskId: string;
@@ -34,6 +37,7 @@ function CalendarPageContent() {
   const [stats, setStats] = useState<SyncStats>({ eventsProcessed: 0, tasksCreated: 0, suggestionsFound: 0 });
   const [mounted, setMounted] = useState(false);
   const [creatingEvents, setCreatingEvents] = useState<Set<string>>(new Set());
+  const { dialogState, showSuccess, showError, closeDialog } = useSyncDialog();
 
   const calendarLoadingStates = [
     { text: "Connecting to Google Calendar..." },
@@ -68,14 +72,26 @@ function CalendarPageContent() {
           eventsProcessed: data.eventsProcessed,
           tasksCreated: data.tasksCreated
         }));
-        alert(`Successfully synced ${data.eventsProcessed} calendar events and created ${data.tasksCreated} tasks!`);
+        showSuccess(
+          'Calendar Sync Complete!',
+          `Successfully synced ${data.eventsProcessed} calendar events and created ${data.tasksCreated} tasks.`,
+          'Check the Tasks page to see your new action items from calendar events.'
+        );
       } else {
         const errorData = await response.json();
-        alert(`Sync failed: ${errorData.error}`);
+        showError(
+          'Calendar Sync Failed',
+          `Sync failed: ${errorData.error}`,
+          'Please check your Google Calendar connection and try again.'
+        );
       }
     } catch (error) {
       console.error("Calendar sync failed:", error);
-      alert("Calendar sync failed. Check console for details.");
+      showError(
+        'Calendar Sync Error',
+        'Calendar sync failed due to network error.',
+        'Please check your connection and try again.'
+      );
     } finally {
       setIsSyncing(false);
     }
@@ -121,14 +137,26 @@ function CalendarPageContent() {
 
       if (response.ok) {
         const data = await response.json();
-        alert(`✅ Calendar integration test successful!\n\n📅 Created test event: "${data.eventTitle}"\n🕐 Start time: ${new Date(data.startTime).toLocaleString()}\n🔗 Event ID: ${data.eventId}\n\nYou can view it in Google Calendar!`);
+        showSuccess(
+          'Calendar Integration Test Successful!',
+          `Created test event: "${data.eventTitle}" at ${new Date(data.startTime).toLocaleString()}.`,
+          `Event ID: ${data.eventId}. You can view it in Google Calendar!`
+        );
       } else {
         const errorData = await response.json();
-        alert(`❌ Calendar integration test failed!\n\nError: ${errorData.error}\n\nSuggestion: ${errorData.suggestion || 'Please check your Google Calendar permissions.'}`);
+        showError(
+          'Calendar Integration Test Failed',
+          `Error: ${errorData.error}`,
+          errorData.suggestion || 'Please check your Google Calendar permissions and try again.'
+        );
       }
     } catch (error) {
       console.error("Calendar test failed:", error);
-      alert("❌ Calendar integration test failed due to network error.\n\nPlease check your internet connection and try again.");
+      showError(
+        'Calendar Test Error',
+        'Calendar integration test failed due to network error.',
+        'Please check your internet connection and try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -154,16 +182,28 @@ function CalendarPageContent() {
 
       if (response.ok) {
         const data = await response.json();
-        alert(`Calendar event created successfully! Event ID: ${data.eventId}`);
+        showSuccess(
+          'Calendar Event Created!',
+          `Successfully created "${suggestion.title}" in your Google Calendar.`,
+          `Event ID: ${data.eventId}. The event is now scheduled and you'll receive notifications.`
+        );
         // Remove this suggestion from the list
         setSuggestions(prev => prev.filter(s => s.taskId !== suggestion.taskId));
       } else {
         const errorData = await response.json();
-        alert(`Failed to create event: ${errorData.error}`);
+        showError(
+          'Event Creation Failed',
+          `Failed to create event: ${errorData.error}`,
+          'Please check your Google Calendar permissions and try again.'
+        );
       }
     } catch (error) {
       console.error("Create event failed:", error);
-      alert("Failed to create calendar event. Check console for details.");
+      showError(
+        'Event Creation Error',
+        'Failed to create calendar event due to network error.',
+        'Please check your connection and try again.'
+      );
     } finally {
       setCreatingEvents(prev => {
         const newSet = new Set(prev);
@@ -387,6 +427,16 @@ function CalendarPageContent() {
         />
         
       </div>
+
+      {/* Sync Dialog */}
+      <SyncDialog
+        isOpen={dialogState.isOpen}
+        onClose={closeDialog}
+        success={dialogState.success}
+        title={dialogState.title}
+        message={dialogState.message}
+        details={dialogState.details}
+      />
     </DashboardLayout>
   );
 }
@@ -401,13 +451,8 @@ export default function CalendarPage() {
   if (!mounted) {
     return (
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Google Calendar Integration</h1>
-              <p className="text-gray-600">Loading...</p>
-            </div>
-          </div>
+        <div className="min-h-screen flex items-center justify-center">
+          <LoaderOne />
         </div>
       </DashboardLayout>
     );
