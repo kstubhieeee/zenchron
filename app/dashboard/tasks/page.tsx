@@ -139,30 +139,7 @@ export default function TasksPage() {
         </div>
 
         {/* Quick Actions */}
-        <Card className="border-0 ">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Zap className="h-5 w-5 text-orange-500" />
-              <span>Quick Actions</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button variant="outline" className="h-16 flex-col space-y-2 hover:bg-blue-50 hover:border-blue-200">
-                <Timer className="h-5 w-5 text-blue-600" />
-                <span className="text-sm">Start Focus Session</span>
-              </Button>
-              <Button variant="outline" className="h-16 flex-col space-y-2 hover:bg-green-50 hover:border-green-200">
-                <Target className="h-5 w-5 text-green-600" />
-                <span className="text-sm">Set Daily Goals</span>
-              </Button>
-              <Button variant="outline" className="h-16 flex-col space-y-2 hover:bg-purple-50 hover:border-purple-200">
-                <Users className="h-5 w-5 text-purple-600" />
-                <span className="text-sm">Team Collaboration</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        
       </div>
     </DashboardLayout>
   );
