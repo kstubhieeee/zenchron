@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { RefreshCw, Calendar, Clock, Zap, Plus, ExternalLink, CheckCircle, AlertCircle } from "lucide-react";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 interface CalendarSuggestion {
   taskId: string;
@@ -33,6 +34,17 @@ function CalendarPageContent() {
   const [stats, setStats] = useState<SyncStats>({ eventsProcessed: 0, tasksCreated: 0, suggestionsFound: 0 });
   const [mounted, setMounted] = useState(false);
   const [creatingEvents, setCreatingEvents] = useState<Set<string>>(new Set());
+
+  const calendarLoadingStates = [
+    { text: "Connecting to Google Calendar..." },
+    { text: "Fetching calendar events..." },
+    { text: "Analyzing your schedule..." },
+    { text: "Finding optimal time slots..." },
+    { text: "Generating smart suggestions..." },
+    { text: "Optimizing for productivity..." },
+    { text: "Creating calendar events..." },
+    { text: "Calendar optimization complete!" },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -366,6 +378,13 @@ function CalendarPageContent() {
         </Card>
 
         {/* How It Works */}
+        {/* Multi-Step Loader */}
+        <MultiStepLoader 
+          loadingStates={calendarLoadingStates} 
+          loading={isLoading || isSyncing || isAnalyzing} 
+          duration={1500}
+          loop={false}
+        />
         
       </div>
     </DashboardLayout>

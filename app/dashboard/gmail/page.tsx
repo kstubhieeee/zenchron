@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { RefreshCw, Mail, Clock, User } from "lucide-react";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 
 
@@ -36,6 +37,17 @@ export default function GmailPage() {
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [stats, setStats] = useState({ total: 0, work: 0, tasks: 0, processed: 0 });
   const [activeTab, setActiveTab] = useState<'new' | 'processed'>('new');
+
+  const gmailLoadingStates = [
+    { text: "Connecting to Gmail account..." },
+    { text: "Fetching recent emails..." },
+    { text: "Filtering work-related emails..." },
+    { text: "Analyzing email content..." },
+    { text: "Extracting actionable items..." },
+    { text: "Creating tasks from emails..." },
+    { text: "Organizing by priority..." },
+    { text: "Email sync completed!" },
+  ];
 
   const syncEmails = async () => {
     setIsLoading(true);
@@ -256,6 +268,13 @@ export default function GmailPage() {
           </CardContent>
         </Card>
 
+        {/* Multi-Step Loader */}
+        <MultiStepLoader 
+          loadingStates={gmailLoadingStates} 
+          loading={isLoading} 
+          duration={1500}
+          loop={false}
+        />
         
       </div>
     </DashboardLayout>

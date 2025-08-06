@@ -6,7 +6,12 @@ import { Badge } from "@/components/ui/badge"
 import { AnimatedBeam } from "@/components/ui/animated-beam"
 import { FloatingIcons } from "@/components/ui/floating-icons"
 import { ToggleSwitch } from "@/components/ui/toggle-switch"
-import { FloatingNavDemo } from "@/components/navigation/floating-nav-demo"
+import { EnhancedNavbar } from "@/components/ui/enhanced-navbar"
+import { PricingSection, PricingTier } from "@/components/landing/PricingSection";
+import { BentoDemo } from "@/components/landing/BentoDemo";
+import { HeroVideoDialogDemo } from "@/components/demos/HeroVideoDialogDemo";
+import { AvatarCirclesDemo } from "@/components/demos/AvatarCirclesDemo";
+import { TestimonialsDemo } from "@/components/demos/TestimonialsDemo";
 import {
   Check,
   ArrowRight,
@@ -21,7 +26,6 @@ import {
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
-import Bento from "@/components/ui/bento"
 
 export default function LandingPage() {
   const [isYearly, setIsYearly] = useState(false)
@@ -120,19 +124,80 @@ export default function LandingPage() {
     },
   ]
 
+  const pricingData = {
+    title: "Pricing that scales with you",
+    description: "Whichever plan you pick, it's free until you love your docs. That's our promise.",
+    pricingItems: [
+      {
+        name: "Free",
+        price: "$0",
+        yearlyPrice: "$0",
+        description: "Perfect for individual users",
+        features: [
+          "Custom domain",
+          "SEO optimizations",
+          "Auto-generated API docs",
+          "Built-in components library"
+        ],
+        buttonText: "Start Free",
+        buttonColor: "bg-blue-100 text-blue-700 hover:bg-blue-200",
+        isPopular: false,
+      },
+      {
+        name: "Startup",
+        price: "$12",
+        yearlyPrice: "$9",
+        description: "Ideal for professionals and small teams",
+        features: [
+          "Custom domain",
+          "SEO optimizations",
+          "Auto-generated API docs",
+          "Built-in components library",
+          "E-commerce integration",
+          "User authentication system",
+          "Multi-language support",
+          "Real-time collaboration tools",
+          "Advanced analytics dashboard",
+          "Priority email support",
+          "Custom branding options",
+          "Webhook integrations"
+        ],
+        buttonText: "Upgrade to Pro",
+        buttonColor: "bg-blue-600 text-white hover:bg-blue-700",
+        isPopular: true,
+      },
+      {
+        name: "Enterprise",
+        price: "$24",
+        yearlyPrice: "$19",
+        description: "Best for large teams and enterprise-level organizations",
+        features: [
+          "Custom domain",
+          "SEO optimizations",
+          "Auto-generated API docs",
+          "Built-in components library",
+          "Real-time collaboration tools"
+        ],
+        buttonText: "Contact Sales",
+        buttonColor: "bg-blue-100 text-blue-700 hover:bg-blue-200",
+        isPopular: false,
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Floating Navigation */}
-      <FloatingNavDemo />
+      {/* Enhanced Blue Navbar */}
+      <EnhancedNavbar />
 
       <main>
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-blue-50 pt-16 pb-20 sm:pt-24 sm:pb-32">
-         
+
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
               {/* Badge */}
-            
+
               {/* Hero Headline */}
               <div className="mb-6 mt-32">
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
@@ -164,226 +229,30 @@ export default function LandingPage() {
                 </Link>
               </div>
 
+              {/* Avatar Circles */}
+              <div className="mb-8 flex justify-center">
+                <AvatarCirclesDemo />
+              </div>
+
               {/* Demo Video Section */}
               <div className="relative max-w-4xl mx-auto">
-                <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-blue-100 to-blue-200 p-1">
-                  <AnimatedBeam className="rounded-2xl" />
-                  <div className="bg-white rounded-xl h-96 sm:h-[500px] flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-white"></div>
-
-                    {/* Window Controls */}
-                    <div className="absolute top-6 left-6 flex space-x-2">
-                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                      <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                    </div>
-
-                    {/* Play Button */}
-                    <div className="relative z-10 flex items-center justify-center">
-                      <Button
-                        size="lg"
-                        className="h-16 w-16 rounded-full bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110"
-                      >
-                        <Play className="h-6 w-6 text-white ml-1" fill="currentColor" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                <HeroVideoDialogDemo />
               </div>
             </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <Bento />
-
-        {/* Social Proof Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <p className="text-gray-600 font-medium">Trusted by fast-growing startups</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center">
-              {companies.map((company, index) => (
-                <div
-                  key={company.name}
-                  className="flex flex-col items-center space-y-3 opacity-60 hover:opacity-100 transition-opacity"
-                >
-                  <div className="w-12 h-12 bg-white rounded-lg shadow-sm border border-gray-200 flex items-center justify-center">
-                    <Image src={company.logo} alt={company.name} width={24} height={24} />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">{company.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        
-
-        {/* Security & Growth Section */}
-        
-
-        {/* Pricing Section */}
-        <section id="pricing" className="py-20 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Pricing that scales with you</h2>
-              <p className="text-lg text-gray-600 mb-8">
-                Whichever plan you pick, it's free until you love your docs. That's our promise.
-              </p>
-
-              {/* Pricing Toggle */}
-              <div className="flex justify-center">
-                <ToggleSwitch checked={isYearly} onChange={setIsYearly} leftLabel="Monthly" rightLabel="Yearly" />
-              </div>
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {/* Free Plan */}
-              <Card className="relative">
-                <CardHeader>
-                  <CardTitle className="text-lg">Free</CardTitle>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-4xl font-bold">$0</span>
-                    <span className="text-gray-500">/month</span>
-                  </div>
-                  <CardDescription>Perfect for individual users</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Link href="/dashboard/tasks">
-                    <Button variant="outline" className="w-full bg-transparent">
-                      Start Free
-                    </Button>
-                  </Link>
-                  <div className="space-y-3">
-                    <p className="font-medium text-sm">Everything in Pro +</p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Custom domain</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>SEO optimizations</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Auto-generated API docs</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Built-in components library</span>
-                      </li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Startup Plan */}
-              <Card className="relative border-blue-200 shadow-lg">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-blue-600 text-white">Popular</Badge>
-                </div>
-                <CardHeader>
-                  <CardTitle className="text-lg">Startup</CardTitle>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-4xl font-bold">${isYearly ? "10" : "12"}</span>
-                    <span className="text-gray-500">/month</span>
-                  </div>
-                  <CardDescription>Ideal for professionals and small teams</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Link href="/dashboard/tasks">
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">Upgrade to Pro</Button>
-                  </Link>
-                  <div className="space-y-3">
-                    <p className="font-medium text-sm">Everything in Pro +</p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Custom domain</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>SEO optimizations</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Auto-generated API docs</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Built-in components library</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>E-commerce integration</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>User authentication system</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Multi-language support</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Real-time collaboration tools</span>
-                      </li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Enterprise Plan */}
-              <Card className="relative">
-                <CardHeader>
-                  <CardTitle className="text-lg">Enterprise</CardTitle>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-4xl font-bold">${isYearly ? "19" : "24"}</span>
-                    <span className="text-gray-500">/month</span>
-                  </div>
-                  <CardDescription>Best for large teams and enterprise-level organizations</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button variant="outline" className="w-full bg-transparent">
-                    Contact Sales
-                  </Button>
-                  <div className="space-y-3">
-                    <p className="font-medium text-sm">Everything in Pro +</p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Custom domain</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>SEO optimizations</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Auto-generated API docs</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Built-in components library</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>Real-time collaboration tools</span>
-                      </li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+        <BentoDemo />
 
         {/* Testimonials Section */}
-        
+        <TestimonialsDemo />
+
+        {/* Pricing Section */}
+        <PricingSection {...pricingData} />
+
+        {/* Testimonials Section */}
+
 
         {/* FAQ Section */}
         <section id="contact" className="py-20 bg-white">

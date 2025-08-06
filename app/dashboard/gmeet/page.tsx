@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { Download, Video, FileText, Zap, Copy, CheckCircle, AlertCircle, ExternalLink, Settings, Webhook, User } from "lucide-react";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { useSession } from "next-auth/react";
 
 interface MeetingRecord {
@@ -26,6 +27,17 @@ function GMeetPageContent() {
   const [webhookUrl, setWebhookUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
+
+  const gmeetLoadingStates = [
+    { text: "Connecting to Google Meet..." },
+    { text: "Fetching meeting recordings..." },
+    { text: "Processing meeting transcripts..." },
+    { text: "Analyzing conversation content..." },
+    { text: "Extracting action items..." },
+    { text: "Identifying key decisions..." },
+    { text: "Creating follow-up tasks..." },
+    { text: "Meeting analysis complete!" },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -256,6 +268,13 @@ function GMeetPageContent() {
         </Card>
 
         {/* How It Works */}
+        {/* Multi-Step Loader */}
+        <MultiStepLoader 
+          loadingStates={gmeetLoadingStates} 
+          loading={isLoading} 
+          duration={1500}
+          loop={false}
+        />
         
       </div>
     </DashboardLayout>

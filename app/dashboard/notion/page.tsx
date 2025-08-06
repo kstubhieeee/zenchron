@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { RefreshCw, FileText, Database, Clock, Link as LinkIcon, CheckCircle, AlertCircle, Eye, X, ChevronRight, ChevronDown, Zap, CheckSquare } from "lucide-react";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 interface NotionPage {
   id: string;
@@ -75,6 +76,17 @@ function NotionPageContent() {
   const [showContentModal, setShowContentModal] = useState(false);
   const [extractingTasks, setExtractingTasks] = useState<string | null>(null);
   const [processedPages, setProcessedPages] = useState<Set<string>>(new Set());
+
+  const notionLoadingStates = [
+    { text: "Connecting to Notion workspace..." },
+    { text: "Fetching pages and databases..." },
+    { text: "Analyzing page content..." },
+    { text: "Scanning for actionable items..." },
+    { text: "Extracting tasks and todos..." },
+    { text: "Processing page relationships..." },
+    { text: "Organizing extracted data..." },
+    { text: "Notion sync completed!" },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -732,6 +744,14 @@ function NotionPageContent() {
             </div>
           </div>
         )}
+
+        {/* Multi-Step Loader */}
+        <MultiStepLoader 
+          loadingStates={notionLoadingStates} 
+          loading={isLoading || !!extractingTasks} 
+          duration={1500}
+          loop={false}
+        />
       </div>
     </DashboardLayout>
   );

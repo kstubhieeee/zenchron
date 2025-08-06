@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { RefreshCw, MessageSquare, Users, Hash, User, Clock, Zap } from "lucide-react";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 interface SlackMessage {
   ts: string;
@@ -48,6 +49,17 @@ function SlackPageContent() {
   const [mounted, setMounted] = useState(false);
   const [extractingTasks, setExtractingTasks] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
+
+  const slackLoadingStates = [
+    { text: "Connecting to Slack workspace..." },
+    { text: "Fetching channel list..." },
+    { text: "Scanning for relevant messages..." },
+    { text: "Analyzing message content..." },
+    { text: "Extracting actionable tasks..." },
+    { text: "Organizing tasks by priority..." },
+    { text: "Syncing with task manager..." },
+    { text: "Tasks successfully extracted!" },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -274,12 +286,12 @@ function SlackPageContent() {
                 {isLoading ? "Fetching..." : "Fetch Messages"}
               </Button>
               <Button 
-                onClick={extractTasks} 
+                onClick={() => setExtractingTasks(true)} 
                 disabled={isLoading || extractingTasks}
                 className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700"
               >
-                <Zap className={`h-4 w-4 ${extractingTasks ? "animate-spin" : ""}`} />
-                {extractingTasks ? "Extracting..." : "Extract Tasks"}
+                <Zap className="h-4 w-4" />
+                Extract Tasks
               </Button>
               
               <Button variant="outline" onClick={disconnectSlack}>
@@ -453,7 +465,13 @@ function SlackPageContent() {
         {/* Debug Info */}
        
 
-        {/* Task Extraction Info */}
+        {/* Multi-Step Loader */}
+        <MultiStepLoader 
+          loadingStates={slackLoadingStates} 
+          loading={extractingTasks} 
+          duration={1500}
+          loop={false}
+        />
         
       </div>
     </DashboardLayout>

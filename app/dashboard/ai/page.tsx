@@ -21,6 +21,7 @@ import {
   Flag,
   X
 } from "lucide-react";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 
 interface TaskAnalysis {
   totalTasks: number;
@@ -90,6 +91,17 @@ function AIPageContent() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+
+  const aiLoadingStates = [
+    { text: "Initializing AI analysis..." },
+    { text: "Gathering task data..." },
+    { text: "Analyzing productivity patterns..." },
+    { text: "Calculating priority matrix..." },
+    { text: "Generating smart suggestions..." },
+    { text: "Optimizing task schedule..." },
+    { text: "Creating personalized insights..." },
+    { text: "AI analysis complete!" },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -693,6 +705,14 @@ function AIPageContent() {
             Last analysis: {new Date(lastAnalysis).toLocaleString()}
           </div>
         )}
+
+        {/* Multi-Step Loader */}
+        <MultiStepLoader 
+          loadingStates={aiLoadingStates} 
+          loading={isAnalyzing} 
+          duration={1500}
+          loop={false}
+        />
       </div>
     </DashboardLayout>
   );
