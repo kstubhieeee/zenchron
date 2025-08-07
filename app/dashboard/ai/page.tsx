@@ -166,7 +166,7 @@ function AIPageContent() {
                   <Brain className="h-8 w-8" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold mb-2">AI Task Planner</h1>
+                  <h1 className="font-bodoni text-4xl font-bold mb-2">AI Task Planner</h1>
                   <p className="text-indigo-100 text-lg">Intelligent execution plans and prioritization for your tasks</p>
                 </div>
               </div>

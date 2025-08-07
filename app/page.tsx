@@ -200,7 +200,7 @@ export default function LandingPage() {
 
               {/* Hero Headline */}
               <div className="mb-6 mt-32">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
+                <h1 className="font-bodoni text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
                   Meet your AI Agent
                   <br />
                   <span className="text-gray-800">Streamline your workflow</span>
@@ -258,7 +258,7 @@ export default function LandingPage() {
         <section id="contact" className="py-20 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+              <h2 className="font-bodoni text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
               <p className="text-lg text-gray-600">
                 Answers to common questions about Zenchron and its features. If you have any other questions, please
                 don't hesitate to contact us.
@@ -293,7 +293,7 @@ export default function LandingPage() {
         <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4">Ready to streamline your workflow?</h2>
+              <h2 className="font-bodoni text-3xl sm:text-4xl font-bold mb-4">Ready to streamline your workflow?</h2>
               <p className="text-xl mb-8 text-blue-100">
                 Join thousands of teams who have transformed their productivity with Zenchron. Start your free trial
                 today and see the difference.

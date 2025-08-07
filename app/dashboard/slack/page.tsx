@@ -270,7 +270,7 @@ function SlackPageContent() {
                   <MessageSquare className="h-8 w-8" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold mb-2">Slack Intelligence</h1>
+                  <h1 className="font-bodoni text-4xl font-bold mb-2">Slack Intelligence</h1>
                   <p className="text-purple-100 text-lg">Transform conversations into actionable tasks</p>
                 </div>
               </div>

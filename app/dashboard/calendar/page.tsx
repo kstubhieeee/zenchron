@@ -218,7 +218,7 @@ function CalendarPageContent() {
                   <Calendar className="h-8 w-8" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold mb-2">Calendar Intelligence</h1>
+                  <h1 className="font-bodoni text-4xl font-bold mb-2">Calendar Intelligence</h1>
                   <p className="text-blue-100 text-lg">AI-powered scheduling and event optimization</p>
                 </div>
               </div>

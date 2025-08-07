@@ -69,12 +69,12 @@ export default function TasksPage() {
     setRefreshKey(prev => prev + 1);
   };
 
- 
+
 
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        
+
 
         {/* Quick Stats Cards - Mobile */}
         <div className="grid grid-cols-2 md:hidden gap-4">
@@ -114,32 +114,32 @@ export default function TasksPage() {
                 <Plus className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <CardTitle className="text-xl">Create New Tasks</CardTitle>
+                <CardTitle className="font-bodoni text-xl">Create New Tasks</CardTitle>
                 <CardDescription>Use voice input, type manually, or try our quick examples</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <TaskInput 
-              onTasksCreated={handleTasksCreated} 
+            <TaskInput
+              onTasksCreated={handleTasksCreated}
               externalInput={taskInput}
               onInputChange={setTaskInput}
             />
-            
+
             {/* Quick Example Buttons */}
-            
+
           </CardContent>
         </Card>
 
         {/* Enhanced Kanban Board */}
         <div className="space-y-4">
-        
-          
+
+
           <KanbanBoard refreshTrigger={refreshKey} />
         </div>
 
         {/* Quick Actions */}
-        
+
       </div>
     </DashboardLayout>
   );

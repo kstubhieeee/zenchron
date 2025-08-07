@@ -208,7 +208,7 @@ export function KanbanBoard({ onAddTask, refreshTrigger }: KanbanBoardProps) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">Task Board</h2>
+            <h2 className="font-bodoni text-3xl font-bold text-gray-900">Task Board</h2>
             <p className="text-gray-600 mt-1">Organize and track your tasks by category</p>
           </div>
           <div className="flex items-center gap-3">

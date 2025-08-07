@@ -154,7 +154,7 @@ function GMeetPageContent() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Google Meet Integration</h1>
+            <h1 className="font-bodoni text-3xl font-bold text-gray-900">Google Meet Integration</h1>
             <p className="text-gray-600">Extract tasks from meeting transcripts using TranscripTonic extension</p>
           </div>
           <div className="flex gap-2">

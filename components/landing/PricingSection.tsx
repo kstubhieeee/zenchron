@@ -92,7 +92,7 @@ export function PricingSection({ title, description, pricingItems }: PricingSect
     return (
         <section id="pricing" className="flex flex-col items-center justify-center gap-10 pb-10 w-full relative bg-gray-50">
             <div className="text-center mt-32 space-y-3 mb-8">
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
+                <h2 className="font-bodoni text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
                     {title}
                 </h2>
                 <p className="text-gray-600 font-normal max-w-2xl mx-auto">

@@ -264,7 +264,7 @@ function NotionPageContent() {
                   <FileText className="h-8 w-8" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold mb-2">Notion Integration</h1>
+                  <h1 className="font-bodoni text-4xl font-bold mb-2">Notion Integration</h1>
                   <p className="text-gray-300 text-lg">Transform your Notion pages into actionable tasks</p>
                 </div>
               </div>
