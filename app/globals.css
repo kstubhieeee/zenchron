@@ -114,3 +114,7 @@
     transform: rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * 1px)) rotate(calc((var(--angle) * -1deg) - 360deg));
     }
   }}
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
