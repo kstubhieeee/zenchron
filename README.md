@@ -1,7 +1,7 @@
 # Zenchron - AI-Powered Task Management Platform
 
 <div align="center">
-  <img src="/zenn.png" alt="Zenchron Logo" width="120" height="120" />
+  <img src="./public/zenn.png" alt="Zenchron Logo" width="120" height="120" />
   
   **Streamline your workflow, amplify your success**
   
